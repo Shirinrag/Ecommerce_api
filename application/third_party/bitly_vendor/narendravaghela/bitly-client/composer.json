@@ -1,0 +1,28 @@
+{
+    "name": "narendravaghela/bitly-client",
+    "description": "PHP client library to access Bitly APIs",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/narendravaghela/bitly-client",
+    "keywords": ["bitly", "php"],
+    "authors": [
+        {
+            "name": "Narendra Vaghela",
+            "email": "narendravaghela4389@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "guzzlehttp/guzzle": "^6.2"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*",
+        "phpunit/phpunit": "^5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bitly\\": "src"
+        }
+    },
+    "prefer-stable": true
+}
