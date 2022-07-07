@@ -23,7 +23,7 @@ date_default_timezone_set('America/New_york');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/ecommerce/';
+$config['base_url'] = 'http://localhost/stzsoft/Ecommerce_api/';
 // define("APPURL","http://localhost/EGtech/egtech_app/");
 /*
 |--------------------------------------------------------------------------

@@ -5,7 +5,7 @@ class Link extends CI_Model {
 
 function hits($link,$request,$token='',$type = 1)
     {
-        $Base_API = 'http://localhost/ecommerce/';
+        $Base_API = 'http://localhost/stzsoft/Ecommerce_api/';
         $query = http_build_query($request);
         if ($type == 0) {
             $custom_type = 'GET';
