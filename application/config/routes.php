@@ -68,4 +68,9 @@ $route['forget-password']='Frontend/forget_password';
 $route['save-wishlist']='Frontend/add_wishlist';
 $route['product-details-on-id']='Frontend/product_details_on_id';
 $route['product-details-on-search']='Frontend/get_product_on_search';
+$route['send-otp']='Frontend/send_otp';
+$route['get-language']='Frontend/get_language';
+$route['get-user-profile-data']='Frontend/get_user_profile_data';
+$route['get-dynamic-menu'] = 'Frontend/get_dynamic_menu';
+
 

@@ -30,6 +30,22 @@ class Frontend extends REST_Controller {
         $response = array('status' => false, 'msg' => 'Oops! Please try again later.', 'code' => 200);
         echo json_encode($response);
     }
+    public function get_language_get()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if ($validate) {
+              $lang_name = $this->model->selectWhereData('tbl_language', array(),array('id','lang_name'),false);
+              $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['lang_name'] = $lang_name;
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
     // Home Page API
     public function get_home_page_data_post()
     {
@@ -59,8 +75,7 @@ class Frontend extends REST_Controller {
     public function register_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
-            $first_name = $this->input->post('first_name');
-            $last_name = $this->input->post('last_name');
+            $user_name = $this->input->post('user_name');
             $email = $this->input->post('email');
             $contact_no = $this->input->post('contact_no');
             $device_type = $this->input->post('device_type');
@@ -70,16 +85,10 @@ class Frontend extends REST_Controller {
             $app_build_no = $this->input->post('app_build_no');
             $password = $this->input->post('password');
 
-            if(empty($first_name)){
-                $response['message']= "First Name is required";
+            if(empty($user_name)){
+                $response['message']= "User Name is required";
                 $response['code']= 201;
-            }else if(empty($last_name)){
-                $response['message']= "Last Name is required";
-                $response['code']= 201;
-            }else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $response['message'] = 'Provide valid email address.';
-                $response['code'] = 201;
-            }else if (!empty($contact_no) && !preg_match('/^[0-9]{10}+$/', $contact_no)) {
+            }else if (empty($contact_no)) {
                 $response['message'] = 'Contact Number should be 10 number digits.';
                 $response['code'] = 201;
             } else if(empty($password)){
@@ -88,6 +97,7 @@ class Frontend extends REST_Controller {
             }else{
                
                 $check_contact_no_count = $this->model->CountWhereRecord('op_user',array('contact_no'=>$contact_no,'status'=>'1'));
+                // echo '<pre>'; print_r($check_contact_no_count); exit;
                 if ($check_contact_no_count > 0) {
                     $response['message'] = 'Contact No is already exist.';
                     $response['code'] = 201;
@@ -99,7 +109,7 @@ class Frontend extends REST_Controller {
                         $termsCondtnId = (string)count($getTermsConditionId) > 0 ? $getTermsConditionId[0]['id'] : 0;
 
                         $curl_data = array(
-                            'user_name' =>$first_name." ".$last_name,
+                            'user_name' =>$user_name,
                             'email' =>$email,
                             'password'=>dec_enc('encrypt',$password),
                             'contact_no'=>$contact_no,
@@ -516,6 +526,58 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
+    public function send_otp_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if ($validate) { 
+            $contact_no = $this->input->post('contact_no');
+            if(empty($contact_no)){
+                $response['message'] = 'Contact No is required';
+                $response['code'] =201;
+            }else{
+                    $this->load->library('Smsglobal');
 
+                    $otp = generateOTP();
+
+                    $message = "Your OTP is ".$otp;
+
+                    $curl_data = $this->smsglobal->sms_send($contact_no,$message);
+                    echo '<pre>'; print_r($curl_data); exit;
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    // $response['cat_data'] = $cat_data;
+            }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function get_user_profile_data_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if ($validate) { 
+            $user_id = $this->input->post('user_id');
+            if(empty($user_id)){
+                $response['message'] = 'User Id is required';
+                $response['code'] =201;
+            }else{
+                $user_profile_data = $this->model->selectWhereData('op_user', array('status'=>1,'op_user_id'=>$user_id),array('*'));
+
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;
+                $response['message'] = 'success';
+                $response['user_profile'] = $user_profile_data;
+            }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
 
 }

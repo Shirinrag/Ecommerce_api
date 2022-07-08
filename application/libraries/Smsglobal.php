@@ -2,7 +2,7 @@
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 require_once FCPATH.'vendor/autoload.php';
 
-class SMSGlobal{
+class Smsglobal {
 
     public function sms_send($contact_number="",$message="")
     {
