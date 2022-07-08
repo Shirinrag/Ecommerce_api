@@ -566,7 +566,7 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'User Id is required';
                 $response['code'] =201;
             }else{
-                $user_profile_data = $this->model->selectWhereData('op_user', array('status'=>1,'op_user_id'=>$user_id),array('*'));
+                $user_profile_data = $this->model->selectWhereData('op_user', array('status'=>"1",'op_user_id'=>$user_id),array('*'));
 
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;
