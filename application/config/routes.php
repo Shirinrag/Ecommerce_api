@@ -63,9 +63,9 @@ $route['get-home-page-data']='Frontend/get_home_page_data';
 $route['update-user-profile']='Frontend/update_user_profile';
 $route['save-new-address']='Frontend/save_new_address';
 $route['update-address']='Frontend/update_address';
-$route['update-change-password']='Frontend/update_change_password';
+$route['change-password']='Frontend/update_change_password';
 $route['forget-password']='Frontend/forget_password';
 $route['save-wishlist']='Frontend/add_wishlist';
 $route['product-details-on-id']='Frontend/product_details_on_id';
-$route['product-details-on-id']='Frontend/product_details_on_id';
+$route['product-details-on-search']='Frontend/get_product_on_search';
 

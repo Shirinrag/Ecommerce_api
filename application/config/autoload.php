@@ -132,5 +132,5 @@ $autoload['language'] = array();
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('link','model');
+$autoload['model'] = array('link','model','superadmin_model');
 
