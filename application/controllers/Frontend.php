@@ -36,17 +36,13 @@ class Frontend extends REST_Controller {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
         if ($validate) {
-              $language_name = $this->input->post('language_name');
-              if(empty($language_name)){
+              $fk_lang_id = $this->input->post('fk_lang_id');
+              if(empty($fk_lang_id)){
                     $response['message'] ="Language Name is required";
                     $response['code'] = 201;
               }else{
                     $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
-                    if($language_name=="Arabic"){
-                        $product_data = $this->model->selectWhereData('product', array('status'=>1),array('product_id,category_id,sub_category_id,child_category_id,unit_id,product_name_ar,productdesc_ar'),false);
-                    }else{
-                            $product_data = $this->model->selectWhereData('product', array('status'=>1),array('product_id,category_id,sub_category_id,child_category_id,unit_id,product_name,productdesc_en'),false);
-                    }
+                        $product_data = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
@@ -90,16 +86,12 @@ class Frontend extends REST_Controller {
                 $response['message']= "Pasword is required";
                 $response['code']= 201;
             }else{
-                $check_username_count = $this->model->CountWhereRecord('op_user',array('email'=>$email,'status'=>'1'));
+               
                 $check_contact_no_count = $this->model->CountWhereRecord('op_user',array('contact_no'=>$contact_no,'status'=>'1'));
-                if ($check_username_count > 0) {
-                    $response['message'] = 'Email is already exist.';
-                    $response['code'] = 201;
-                    $response['error_status']="email";
-                }else if ($check_contact_no_count > 0) {
+                if ($check_contact_no_count > 0) {
                     $response['message'] = 'Contact No is already exist.';
                     $response['code'] = 201;
-                    $response['error_status']="email";
+                    $response['error_status']="contact";
                 } else {
                         
                         $getTermsConditionId = $this->model->selectWhereData('tbl_about_us',array('module'=>"1",'type'=>'1','is_deleted'=> '1'),array('*'),false,array('id' => 'desc'));
@@ -148,6 +140,7 @@ class Frontend extends REST_Controller {
                       "contact_no" => $contact_no,
                       "password" => dec_enc('encrypt',$password)
                     );
+                    // echo '<pre>'; print_r($login_credentials_data); exit;
                     $login_info = $this->model->selectWhereData('op_user',$login_credentials_data,'*');
                     if(!empty($login_info)){
                             $response['code'] = REST_Controller::HTTP_OK;;
@@ -332,7 +325,7 @@ class Frontend extends REST_Controller {
                  $this->model->updateData('user_delivery_address', $curl_data, array('id'=>$id));
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;
-                $response['message'] = 'Address Added Successfully'; 
+                $response['message'] = 'Address Updated Successfully'; 
             }   
         }else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -356,7 +349,7 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             } else {
                 $encryptedpassword = dec_enc('encrypt',$password);
-                $this->model->updateData('op_user',array('password'=>$encryptedpassword),array('id'=>trim($user_id)));
+                $this->model->updateData('op_user',array('password'=>$encryptedpassword),array('op_user_id'=>trim($user_id)));
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;
                 $response['message'] = 'success';
@@ -438,12 +431,13 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if($validate){  
             $product_id = $this->input->post('product_id');
+            $fk_lang_id = $this->input->post('fk_lang_id');
             if(empty($product_id)){
                 $response['message'] = 'Product Id is required.';
                 $response['code'] = 201;
             }else{
-                 $product_details = $this->model->selectWhereData('product', array('status'=>1,'product_id'=>$product_id),array('*'),false);
-                 $related_product_details = $this->model->selectWhereData('product_relative', array('status'=>1,'product_id'=>$product_id),array('*'),false);
+                 $product_details = $this->model->selectWhereData('product', array('status'=>1,'product_id'=>$product_id,'fk_lang_id'=>$fk_lang_id),array('*'),false);
+                 $related_product_details = $this->model->selectWhereData('product_relative', array('status'=>1,'product_id'=>$product_id,),array('*'),false);
 
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
@@ -465,20 +459,62 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if($validate){ 
             $search_keyword = $this->input->post('search_keyword');
-            $language_name = $this->input->post('language_name');
-            if(empty($product_id)){
-                $response['message'] = 'Product Id is required.';
+            $fk_lang_id = $this->input->post('fk_lang_id');
+            if(empty($search_keyword)){
+                $response['message'] = 'Search is required.';
+                $response['code'] = 201;
+            }else if(empty($fk_lang_id)){
+                $response['message'] = 'Language is required.';
                 $response['code'] = 201;
             }else{
 
-                $product_details = $this->superadmin_model->get_product_on_search($search_keyword,$language_name);
-
+                $product_details = $this->superadmin_model->get_product_on_search($search_keyword,$fk_lang_id);
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['product_details'] =$product_details;
             }
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
             $response['message'] = 'Unauthorised';
         }
         echo json_encode($response);  
+    }
+
+     public function get_dynamic_menu_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if ($validate) { 
+            $fk_lang_id = $this->input->post('fk_lang_id');
+            if(empty($fk_lang_id)){
+                $response['message'] = 'Language is required';
+                $response['code'] =201;
+            }else{
+                    $this->load->model('superadmin_model');
+                    $cat_data = $this->superadmin_model->get_dynamic_cat($fk_lang_id);
+                    foreach ($cat_data as $cat_data_key => $val) {
+                        $sub_category_id = explode(",", $val['sub_category_id']);
+                        $sub_category_name = explode(",", $val['sub_category_name']);    
+                        $cat_data[$cat_data_key]['sub_category_id'] = $sub_category_id;
+                        $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
+                        foreach ($sub_category_id as $key1 => $val1) {
+                            $child_cat_name = $this->superadmin_model->get_dynamic_childcat($val1,$fk_lang_id);
+                            $custom_key_name = $sub_category_name[$key1] . '_' . $val1 . '_' . $sub_cat_status[$key1];
+                            $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
+                        }
+                    }
+
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['cat_data'] = $cat_data;
+            }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
     }
 
 
