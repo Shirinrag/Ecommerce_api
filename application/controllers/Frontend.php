@@ -510,7 +510,7 @@ class Frontend extends REST_Controller {
                         $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
                         foreach ($sub_category_id as $key1 => $val1) {
                             $child_cat_name = $this->superadmin_model->get_dynamic_childcat($val1,$fk_lang_id);
-                            $custom_key_name = $sub_category_name[$key1] . '_' . $val1 . '_' . $sub_cat_status[$key1];
+                            $custom_key_name = $sub_category_name[$key1] . '_' . $val1 ;
                             $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
                         }
                     }
