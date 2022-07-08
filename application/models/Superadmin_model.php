@@ -25,7 +25,6 @@ class Superadmin_model extends CI_Model {
             GROUP_CONCAT(subcategory.sub_category_id) as sub_category_id');
             $this->db->from('category');
             $this->db->join('subcategory','subcategory.category_id=category.category_id','left');
-            $this->db->where('category.del_status','Active');
             $this->db->where('category.status',1);
             $this->db->where('category.fk_lang_id',$fk_lang_id);
             $this->db->group_by('category.category_id');         
@@ -36,11 +35,10 @@ class Superadmin_model extends CI_Model {
     }
 
      public function get_dynamic_childcat($id="",$fk_lang_id=""){
-        $this->db->select('child_menu_name,id');
-        $this->db->from('tbl_child_menu');     
-        $this->db->where('tbl_child_menu.del_status','Active');
-        $this->db->where('tbl_child_menu.fk_sub_menu_id',$id);
-        $this->db->where('tbl_child_menu.fk_lang_id',$fk_lang_id);
+        $this->db->select('child_category_name,child_category_id');
+        $this->db->from('childcategory');     
+        $this->db->where('childcategory.sub_category_id',$id);
+        $this->db->where('childcategory.fk_lang_id',$fk_lang_id);
         
         $query = $this->db->get();
         $result = $query->result_array();
