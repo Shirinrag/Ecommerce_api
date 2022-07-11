@@ -46,31 +46,39 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
-    // Home Page API
-    public function get_home_page_data_post()
-    {
-        $response = array('code' => - 1, 'status' => false, 'message' => '');
-        $validate = validateToken();
-        if ($validate) {
-              $fk_lang_id = $this->input->post('fk_lang_id');
-              if(empty($fk_lang_id)){
-                    $response['message'] ="Language Name is required";
-                    $response['code'] = 201;
-              }else{
-                    $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
-                        $product_data = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
-                    $response['code'] = REST_Controller::HTTP_OK;
-                    $response['status'] = true;
-                    $response['message'] = 'success';
-                    $response['slider'] = $slider;
-                    $response['product_data'] = $product_data;
-              }
-        }else {
-            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
-            $response['message'] = 'Unauthorised';
-        }
-        echo json_encode($response);
-    }
+  // Home Page API
+  public function get_home_page_data_post()
+  {
+      $response = array('code' => - 1, 'status' => false, 'message' => '');
+      $validate = validateToken();
+      if ($validate) {
+            $fk_lang_id = $this->input->post('fk_lang_id');
+            if(empty($fk_lang_id)){
+                  $response['message'] ="Language Name is required";
+                  $response['code'] = 201;
+            }else{
+                  $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
+                  $product_data = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
+                  $popular = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'popular'=>'1'),array('*'),false);
+                  $featured = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'featured'=>'1'),array('*'),false);
+                  $best_selling = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'best_selling'=>'1'),array('*'),false);
+                  $category = $this->model->selectWhereData('category', array('status'=>1),array('*'),false);
+                  $response['code'] = REST_Controller::HTTP_OK;
+                  $response['status'] = true;
+                  $response['message'] = 'success';
+                  $response['slider'] = $slider;
+                  $response['popular']=$popular;
+                  $response['featured']=$featured;
+                  $response['best_selling']=$best_selling;
+                  $response['product_data'] = $product_data;
+                  $response['category'] = $category;
+            }
+      }else {
+          $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+          $response['message'] = 'Unauthorised';
+      }
+      echo json_encode($response);
+  }
     // Register API
     public function register_post()
     {
@@ -737,7 +745,7 @@ class Frontend extends REST_Controller {
         echo json_encode($response);
     }
 
-     public function get_all_user_cart_post() {
+    public function get_all_user_cart_post() {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
         if($validate){
@@ -763,6 +771,75 @@ class Frontend extends REST_Controller {
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
             $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function plus_minus_cart_count_post(){
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+            $user_id = $this->input->post('user_id'); 
+            $product_id = $this->input->post('product_id');
+            $cart_id = $this->input->post('cart_id'); 
+            $quantity = $this->input->post('quantity');
+            if (empty($user_id)) {
+                $response['message'] = 'User Id is required.';
+                $response['code'] = 201;
+            } else if (empty($product_id)) {
+                $response['message'] = 'Product Id is required.';
+                $response['code'] = 201;
+            }  else if (empty($cart_id)) {
+                $response['message'] = 'Cart Id is required.';
+                $response['code'] = 201;
+            } else{
+                
+            
+                $cart_data = $this->model->selectwhereData('cart',array('cart_id'=>$cart_id),array('*'));
+                $previous_quantity = $cart_data['qty'];
+                if(!empty($cart_data) && !empty($quantity)){
+                    $update_data = array(
+                        'qty'=>$quantity,     
+                    );
+                    $cart_data = $this->model->updateData('cart',$update_data,array('cart_id'=>$cart_id));  
+                } else {
+                    $this->model->deleteData2('cart',array('cart_id' => $cart_id)); 
+                }
+                if($quantity > $previous_quantity){
+                    $message = "Added To Cart Successfully.";
+                } else {
+                    $message = "Removed From Cart Successfully.";
+                }
+                $order_summary_info = $this->superadmin_model->get_order_summary_info($user_id);
+                $total = 0;
+                if(!empty($order_summary_info)){
+                    foreach ($order_summary_info as $order_summary_info_key => $order_summary_info_row) {
+                        $subtotal = ($order_summary_info_row['quantity']*$order_summary_info_row['price'])+$order_summary_info_row['shipping_price'];
+                        $display_image_data = explode(",",$order_summary_info_row['image']);
+                        $display_image = $display_image_data[0];
+                        $ext = pathinfo($display_image, PATHINFO_EXTENSION);
+                        $order_summary_info[$order_summary_info_key]['subtotal'] = custom_number_format($subtotal,2);
+                        $order_summary_info[$order_summary_info_key]['display_image'] = $display_image;
+                        $order_summary_info[$order_summary_info_key]['filetype'] = ".".$ext;
+                        $total = $total+$subtotal;
+                    }
+                    $payment_type_info = $this->users_model->get_payment_type([1,3]);          
+                    $response['code'] = REST_Controller::HTTP_OK;;
+                    $response['status'] = true;
+                    $response['message'] = $message;
+                    $response['payment_type_info'] = $payment_type_info;
+                    $response['order_summary_info'] = $order_summary_info;
+                    $response['total'] = custom_number_format($total,2);
+                    $response['cart_count'] = get_user_cart_count($user_id); 
+                } else {
+                    $response['message'] = 'Cart is empty.';
+                    $response['code'] = 201;
+                    $response['cart_count'] = get_user_cart_count($user_id);
+                }
+            }       
+        }else {
+            $response['message'] = 'Invalid Request';
+            $response['code'] = 204;
         }
         echo json_encode($response);
     }
