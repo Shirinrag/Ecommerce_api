@@ -73,4 +73,13 @@ function add_user_log($user_log)
         $output['token'] = AUTHORIZATION::generateToken($tokenData);
         return $output['token'];
     }
- 
+  function get_user_cart_count($user_id=''){
+        $CI = get_instance();
+        $cart_count = 0;
+        $cart_count_data = $CI->model->selectwhereData('cart',array('user_id'=>$user_id),array('SUM(cart.qty) as cart_count'));
+        if(!empty(@$cart_count_data['cart_count'])){
+            $cart_count=@$cart_count_data['cart_count'];
+        }
+        $cart_count = (string)$cart_count;
+        return $cart_count;
+    }

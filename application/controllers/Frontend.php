@@ -556,6 +556,91 @@ class Frontend extends REST_Controller {
         echo json_encode($response);
     }
 
+    public function verify_otp_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if ($validate) { 
+            $contact_no = $this->input->post('contact_no');
+            $otp = $this->input->post('otp');
+
+            if(empty($contact_no)){
+                $response['message'] = 'Contact No is required';
+                $response['code'] =201;
+            }else if(empty($otp)){
+                $response['message'] = 'Otp is required';
+                $response['code'] =201;
+            }else{
+                    $condition = array('contact_no' => $contact_no, 'otp' => $otp);
+                    $response = $this->superadmin_model->verify_otp('op_user', $contact_no, $otp);
+                    if($response['status']==1){
+                        $user_login_data =array('contact_no' => $contact_no,);
+                        $user_data = $this->model->selectWhereData('op_user', $user_login_data,"*");
+                        $response['status'] = true;
+                        $response['code'] = 200;
+                        $response['message'] = 'Otp Verified Successfullly';
+                        $response['data'] = $user_data;
+                }
+            }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function resend_otp_post() {
+          $response = array('code' => - 1, 'status' => false, 'message' => '');
+          $validate = validateToken();
+            if ($validate) { 
+            $contact_no = $this->input->post('contact_no');
+            $id = $this->input->post('id');
+                if (empty($contact_no)) {
+                    $response['message'] = "Phone No is required";
+                    $response['code'] = 201;
+                }else if (empty($id)) {
+                    $response['message'] = "Id is required";
+                    $response['code'] = 201;
+                } else {
+                    $check_exist_contact1 = $this->model->check_exist('op_user', array('contact_no' => $contact_no, "status" => "1"));
+                    if ($check_exist_contact1['status'] == 0) {
+                        $response = array();
+                        $response['status'] = 0;
+                        $response['message'] = 'Contact No does not exist';
+                        $response['code']=201;
+                    }else {
+                        $otp = mt_rand(100000, 999999);
+                        $date = date('d-m-Y H:i:s');
+                        $condition = array('op_user_id' => $id,);
+                        $get_user_data = $this->model->selectWhereData('op_user', array('op_user_id' => $id,));
+                        $sender_id = $get_user_data['op_user_id'];
+                        $receiver_id = '';
+                        $data = array("otp" => $otp,'contact_no'=>$contact_no);
+                        $this->db->where('op_user_id', $sender_id);
+                        $this->db->update('op_user', $data);
+
+                        $response['message'] = "Otp Sent Successfully";
+                        $response['code'] = 200;
+                        $response['status'] = true;
+                        // if ($response['status'] == 1) {
+                        //         $find = array("+1","(",")");
+                        //         $replace = array("");
+                        //         $mobile_no = array("$mobile");
+                        //         $replace_mobile_no = str_replace($find,$replace,$mobile_no);
+                        //     $smstext = "Thank you for registering with us , Your OTP =" . $otp;
+                        //     send_sms_check($replace_mobile_no[0], $smstext, 'sms');
+                        //     // $sms_data = smslog($sender_id, $receiver_id, $mobile, $smstext, $date, $ip_server);
+                        //     // $curl = $this->api_model->comman_insert('tbl_sms_log', $sms_data);
+                        // }
+                    }
+            }
+         } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
     public function get_user_profile_data_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
@@ -573,6 +658,108 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'success';
                 $response['user_profile'] = $user_profile_data;
             }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    function add_cart_post(){
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+            $user_id=$this->input->post('user_id');
+            $product_id = $this->input->post('product_id');                   
+            if (empty($product_id )) {
+                $response['message'] = 'Product Id is required.';
+                $response['code'] = 201;
+            }else if (empty($user_id)) {
+                $response['message'] = 'user id is required.';
+                $response['code'] = 201;
+            }else{ 
+                $cart_query = $this->model->selectWhereData('cart',array('user_id'=>$user_id,'product_id'=>$product_id),array('cart_id','qty'));
+                if(empty($cart_query['cart_id'])){
+                    $insert_data = array(
+                        'user_id'=>$user_id,
+                        'product_id'=>$product_id,
+                        'qty' =>1, 
+                    );
+                    $cart_id = $this->model->insertData('cart', $insert_data);
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'Added To Cart Successfully.';
+                    $response['id'] = $cart_id;
+                    $response['cart_count'] = get_user_cart_count($user_id);
+                } else {
+                    $updated_quantity = $cart_query['qty']+1;
+                    $update_data = array(
+                        'qty'=>$updated_quantity,
+                    );
+                    $this->model->updateData('cart',$update_data,array('cart_id'=>$cart_query['cart_id']));
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'Added To Cart Successfully.';
+                    $response['id'] = $cart_query['cart_id'];
+                    $response['cart_count'] = get_user_cart_count($user_id);
+                } 
+            }
+        } else {
+            $response['message'] = 'Invalid Request';
+            $response['code'] = 204;
+        }
+        echo json_encode($response);
+    }
+
+    public function delete_cart_post() {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+            $user_id = $this->input->post('user_id'); 
+            $cart_id = $this->input->post('cart_id'); 
+            if (empty($user_id)) {
+                $response['message'] = 'user id is required.';
+                $response['code'] = 201;
+            } else if (empty($cart_id)) {
+                $response['message'] = 'cart id is required.';
+                $response['code'] = 201;
+            } else {
+                $this->model->deleteData2('cart',array('cart_id' =>$cart_id , 'user_id' =>$user_id));
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'Item Removed Successfully.';
+                $response['cart_count'] = get_user_cart_count($user_id);
+            }       
+        }else {
+            $response['message'] = 'Invalid Request';
+            $response['code'] = 204;
+        }
+        echo json_encode($response);
+    }
+
+     public function get_all_user_cart_post() {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+            $user_id = $this->input->post('user_id'); 
+            if (empty($user_id)) {
+                $response['message'] = 'user id is required.';
+                $response['code'] = 201;
+            }
+            else{
+                $cart_data = $this->superadmin_model->get_cart_data($user_id);
+
+                foreach ($cart_data as $cart_data_key => $cart_data_row) {
+                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_price'] * $cart_data_row['qty'];
+                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
+                }
+
+
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['message'] = 'success';
+                $response['status'] = true;  
+                $response['cart_data'] = $cart_data;  
+            }       
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
             $response['message'] = 'Unauthorised';

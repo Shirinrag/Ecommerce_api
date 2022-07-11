@@ -45,4 +45,53 @@ class Superadmin_model extends CI_Model {
         return $result;
     }
 
+      public function verify_otp($table, $mobile_no,$otp) {
+        $response = array();
+        $this->db->select('*');
+        $this->db->from($table);
+        $this->db->where('contact_no', $mobile_no);
+        $query = $this->db->get();
+        $result = $query->row_array();   
+        @$db_otp = $result['otp'];
+        if($db_otp == $otp)
+        {
+            $created_at = $result['added_on'];
+            $timestamp = strtotime($created_at);
+            $t = date('Y-m-d H:i:s');
+            $latest_time = strtotime($t);
+            $interval = abs($latest_time - $timestamp);
+            $minutes = round($interval / 60);
+            // if ($minutes >= 15) {
+            //     $response['message'] = "15 minutes exceeded";
+            //     $response['status'] = "0";
+            // } else {
+                $this->db->set('otp_verify_status', '1'); //value that used to update column
+                $this->db->where('contact_no', $mobile_no); //which row want to upgrade  
+                $this->db->update($table);
+                $response['status'] = "1";
+                $response['message'] = "Otp Verified Successfully";
+                $response['code'] = 200;
+                $response['op_user_id'] = $result['op_user_id'];
+                $response['data']=$result;
+            // }
+        } else {
+            $response['message'] = "otp mismatch";
+            $response['status'] = "0";
+            $response['code']=201;
+        }
+        return $response;
+    }
+
+    public function get_cart_data($user_id="")
+    {
+       $this->db->select('cart.*,product.*');
+       $this->db->from('cart');
+       $this->db->join('product','cart.product_id=product.product_id','left');
+       $this->db->where('cart.user_id',$user_id);
+       $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+
+
 }

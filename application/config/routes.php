@@ -72,5 +72,8 @@ $route['send-otp']='Frontend/send_otp';
 $route['get-language']='Frontend/get_language';
 $route['get-user-profile-data']='Frontend/get_user_profile_data';
 $route['get-dynamic-menu'] = 'Frontend/get_dynamic_menu';
-
-
+$route['verify-otp']='Frontend/verify_otp';
+$route['resend-otp']='Frontend/resend_otp';
+$route['add-to-cart']='Frontend/add_cart';
+$route['delete-cart']='Frontend/delete_cart';
+$route['get-all-user-cart']='Frontend/get_all_user_cart';
