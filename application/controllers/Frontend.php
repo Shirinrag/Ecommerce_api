@@ -58,11 +58,17 @@ class Frontend extends REST_Controller {
                     $response['code'] = 201;
               }else{
                     $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
-                        $product_data = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
+                    $product_data = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
+                    $popular = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'popular'=>'1'),array('*'),false);
+                    $featured = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'featured'=>'1'),array('*'),false);
+                    $best_selling = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'best_selling'=>'1'),array('*'),false);
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
                     $response['slider'] = $slider;
+                    $response['popular']=$popular;
+                    $response['featured']=$featured;
+                    $response['best_selling']=$best_selling;
                     $response['product_data'] = $product_data;
               }
         }else {
@@ -579,5 +585,6 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
+
 
 }
