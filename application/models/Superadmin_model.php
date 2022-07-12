@@ -147,11 +147,10 @@ class Superadmin_model extends CI_Model {
         return $result;
     }
 
-    public function get_search_product($search='',$fk_lang_id="")
+    public function get_search_product($fk_lang_id="")
     {
         $this->db->select('product.product_id,product.product_name,product.product_price,product.image_name,');
         $this->db->from('product');
-        $this->db->like('product.product_name',$search);  
         $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $query = $this->db->get();
         $result = $query->result_array();

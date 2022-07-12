@@ -1012,18 +1012,14 @@ class Frontend extends REST_Controller {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
         if($validate){
-            $search_data = $this->input->post('search_data'); 
-            $fk_lang_id = $this->input->post('fk_lang_id'); 
+              $fk_lang_id = $this->input->post('fk_lang_id'); 
 
-            if (empty($search_data)) {
-                $response['message'] = 'Search Data is required.';
-                $response['code'] = 201;
-            } else if (empty($fk_lang_id)) {
+             if (empty($fk_lang_id)) {
                 $response['message'] = 'Language Id is required.';
                 $response['code'] = 201;
             } else {
                 $this->load->model('superadmin_model');
-                $product_data = $this->superadmin_model->get_search_product($search_data,$fk_lang_id);
+                $product_data = $this->superadmin_model->get_search_product($fk_lang_id);
                 foreach ($product_data as $product_data_key => $product_data_row) {
                    $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
                 }
