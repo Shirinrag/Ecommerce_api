@@ -83,3 +83,16 @@ function add_user_log($user_log)
         $cart_count = (string)$cart_count;
         return $cart_count;
     }
+
+    function custom_number_format($number='',$limit=''){
+        if(!empty($number)){
+            if(empty($limit)){
+                $limit = 2;
+            }
+            $number_1 = number_format($number,$limit);
+            $number_2 = str_replace(",","",$number_1);
+        } else {
+            $number_2 = strval(0);
+        }
+        return $number_2;
+    }

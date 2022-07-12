@@ -94,13 +94,54 @@ class Superadmin_model extends CI_Model {
     }
 
     public function get_order_summary_info($user_id=''){
-        $this->db->select('cart.cart_id,tbl_cart.product_id as cart_product_id,tbl_cart.qty,
+        $this->db->select('cart.cart_id,cart.product_id as cart_product_id,cart.qty,
         product.*');
-        $this->db->from('tbl_cart');      
-        $this->db->join('product','product.product_id=tbl_cart.product_id', 'left');
+        $this->db->from('cart');      
+        $this->db->join('product','product.product_id=cart.product_id', 'left');
         $this->db->where('cart.user_id',$user_id);
         $this->db->where('product.status','1');
         $this->db->order_by('cart.cart_id','DESC'); 
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+
+    public function product_details_on_id($product_id='')
+    {
+        $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url');
+        $this->db->from('product');      
+        $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
+        $this->db->where('product.product_id',$product_id);
+        $this->db->where('product.status','1');
+        $this->db->group_by('product_gallery.product_id');
+        $query = $this->db->get();
+        $result = $query->row_array();
+        return $result;
+    }
+
+    public function related_product_details_on_id($product_id='')
+    {
+         $this->db->select('product_relative.rel_product_id,product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,');
+        $this->db->from('product_relative');      
+        $this->db->join('product','product_relative.product_id=product.product_id','left');
+        $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
+        $this->db->where('product.product_id',$product_id);
+        $this->db->where('product.status','1');
+        $this->db->group_by('product.product_id');
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+
+    public function get_wishlist_data($user_id='')
+    {
+      $this->db->select('wishlist.user_id,wishlist.id,product.*,GROUP_CONCAT(product_gallery.img_url) as img_url');
+        $this->db->from('wishlist');      
+        $this->db->join('product','product.product_id=wishlist.product_id','left');
+        $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
+        $this->db->where('wishlist.user_id',$user_id);
+        $this->db->where('wishlist.status','1');
+        $this->db->group_by('product_gallery.product_id');
         $query = $this->db->get();
         $result = $query->result_array();
         return $result;

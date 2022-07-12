@@ -12,6 +12,7 @@ class Frontend extends REST_Controller {
         header('Access-Control-Allow-Headers: Content-Type');
         header('Content-Type: text/html; charset=utf-8');
         header('Content-Type: application/json; charset=utf-8'); 
+
     }
 
    /*200 = OK
@@ -58,11 +59,44 @@ class Frontend extends REST_Controller {
                   $response['code'] = 201;
             }else{
                   $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
+                  foreach ($slider as $slider_key => $slider_row) {
+                    $slider[$slider_key]['img_url'] = APPURL.$slider_row['img_url'];
+                  }
                   $product_data = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
+
+                   foreach ($product_data as $product_data_key => $product_data_row) {
+                    $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                  }
+
                   $popular = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'popular'=>'1'),array('*'),false);
+                  if(empty($popular)){
+                    $popular=[];
+                  }else{
+                     foreach ($popular as $popular_key => $popular_row) {
+                        $popular[$popular_key]['image_name'] = APPURL.$popular_row['image_name'];
+                      }
+                  }
                   $featured = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'featured'=>'1'),array('*'),false);
+                   if(empty($featured)){
+                    $featured=[];
+                  }else{
+                     foreach ($featured as $featured_key => $featured_row) {
+                        $featured[$featured_key]['image_name'] = APPURL.$featured_row['image_name'];
+                      }
+                  }
                   $best_selling = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'best_selling'=>'1'),array('*'),false);
+                  if(empty($best_selling)){
+                    $best_selling=[];
+                  }else{
+                     foreach ($best_selling as $best_selling_key => $best_selling_row) {
+                        $best_selling[$best_selling_key]['image_name'] = APPURL.$best_selling_row['image_name'];
+                      }
+                  }
                   $category = $this->model->selectWhereData('category', array('status'=>1),array('*'),false);
+                  foreach ($category as $category_key => $category_row) {
+                    $category[$category_key]['image_path'] = APPURL.$category_row['image_path'];
+                  }
+
                   $response['code'] = REST_Controller::HTTP_OK;
                   $response['status'] = true;
                   $response['message'] = 'success';
@@ -168,13 +202,22 @@ class Frontend extends REST_Controller {
                             $response['session_token'] = token_get();
                     } else {
                         $response['code'] = 201;
-                        $response['status'] = "wrong_password";
+                        $response['status'] = false;
+                        $response['status1'] = "wrong_password";
                         $response['message'] = 'Incorrect Password';
+                        $response['data'] = [];
+                        $response['session_token'] = "";
+
                     }      
                 }  else {
                     $response['code'] = 201;
                     $response['message'] = 'Incorrect Username';
-                    $response['status'] = "wrong_username";
+                    $response['status'] = false;
+                    $response['status1'] = "wrong_username";
+                    $response['data'] = [];
+                    $response['session_token'] = "";
+
+
                 }          
             } 
         echo json_encode($response);
@@ -454,8 +497,31 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Product Id is required.';
                 $response['code'] = 201;
             }else{
-                 $product_details = $this->model->selectWhereData('product', array('status'=>1,'product_id'=>$product_id,'fk_lang_id'=>$fk_lang_id),array('*'),false);
-                 $related_product_details = $this->model->selectWhereData('product_relative', array('status'=>1,'product_id'=>$product_id,),array('*'),false);
+                 $product_details = $this->superadmin_model->product_details_on_id($product_id);
+
+               
+                    $product_details['image_name'] = APPURL.$product_details['image_name'];
+
+                    $img_url = explode(',',$product_details['img_url']);
+                    foreach ($img_url as $img_url_key => $img_url_row) {
+                            $img_url1[] = APPURL.$img_url_row;   
+                      }
+                      $product_details['img_url']= implode(',',$img_url1);
+
+                 $related_product_details = $this->superadmin_model->related_product_details_on_id($product_id);
+                 foreach ($related_product_details as $related_product_details_key => $related_product_details_row) {
+                     $related_product_details[$related_product_details_key]['image_name'] = APPURL.$related_product_details_row['image_name'];
+
+                    $related_product_img_url = explode(',',$related_product_details_row['img_url']);
+                    foreach ($related_product_img_url as $related_product_img_url_key => $related_product_img_url_row) {
+                            $related_product_img_url1[]= APPURL.$related_product_img_url_row;   
+                            
+                      }
+                       $related_product_details[$related_product_details_key]['img_url']= implode(',',$related_product_img_url1);
+                     
+                 }
+                 
+
 
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
@@ -814,20 +880,15 @@ class Frontend extends REST_Controller {
                 $total = 0;
                 if(!empty($order_summary_info)){
                     foreach ($order_summary_info as $order_summary_info_key => $order_summary_info_row) {
-                        $subtotal = ($order_summary_info_row['quantity']*$order_summary_info_row['price'])+$order_summary_info_row['shipping_price'];
-                        $display_image_data = explode(",",$order_summary_info_row['image']);
-                        $display_image = $display_image_data[0];
-                        $ext = pathinfo($display_image, PATHINFO_EXTENSION);
+                        $subtotal = ($order_summary_info_row['qty']*$order_summary_info_row['product_price']);
+                       
                         $order_summary_info[$order_summary_info_key]['subtotal'] = custom_number_format($subtotal,2);
-                        $order_summary_info[$order_summary_info_key]['display_image'] = $display_image;
-                        $order_summary_info[$order_summary_info_key]['filetype'] = ".".$ext;
+                      
                         $total = $total+$subtotal;
-                    }
-                    $payment_type_info = $this->users_model->get_payment_type([1,3]);          
+                    }                  
                     $response['code'] = REST_Controller::HTTP_OK;;
                     $response['status'] = true;
                     $response['message'] = $message;
-                    $response['payment_type_info'] = $payment_type_info;
                     $response['order_summary_info'] = $order_summary_info;
                     $response['total'] = custom_number_format($total,2);
                     $response['cart_count'] = get_user_cart_count($user_id); 
@@ -836,6 +897,105 @@ class Frontend extends REST_Controller {
                     $response['code'] = 201;
                     $response['cart_count'] = get_user_cart_count($user_id);
                 }
+            }       
+        }else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function get_all_whislist_post()
+    {
+       $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){  
+            $user_id = $this->input->post('user_id');
+            // $product_id = $this->input->post('product_id');
+
+            if(empty($user_id)){
+                $response['message'] = 'User Id is required.';
+                $response['code'] = 201;
+            }else{
+               $whitelist_data = $this->superadmin_model->get_wishlist_data($user_id);
+
+
+               foreach ($whitelist_data as $whitelist_data_key => $whitelist_data_row) {
+                $whitelist_data[$whitelist_data_key]['image_name'] = APPURL.$whitelist_data_row['image_name'];
+
+                    $whislist_data_img_url = explode(',',$whitelist_data_row['img_url']);
+                    foreach ($whislist_data_img_url as $whislist_data_img_url_key => $whislist_data_img_url_row) {
+                            $whislist_data_img_url1[]= APPURL.$whislist_data_img_url_row;   
+                            
+                      }
+                       $whitelist_data[$whitelist_data_key]['img_url']= implode(',',$whislist_data_img_url1);
+                  
+               }
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['message'] = 'success';
+                $response['status'] = true;  
+                $response['whitelist_data'] = $whitelist_data;  
+            }                 
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response); 
+    }
+
+    public function delete_whislist_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+            $user_id = $this->input->post('user_id'); 
+            $id = $this->input->post('id'); 
+            if (empty($user_id)) {
+                $response['message'] = 'user id is required.';
+                $response['code'] = 201;
+            } else if (empty($id)) {
+                $response['message'] = 'Id is required.';
+                $response['code'] = 201;
+            } else {
+                $this->model->deleteData2('wishlist',array('id' =>$id , 'user_id' =>$user_id));
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'Item Removed Successfully.';
+            }       
+        }else {
+            $response['message'] = 'Invalid Request';
+            $response['code'] = 204;
+        }
+        echo json_encode($response);
+    }
+
+    public function add_user_comment_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+            $user_id = $this->input->post('user_id'); 
+            $product_id = $this->input->post('product_id'); 
+            $comment = $this->input->post('comment'); 
+            if (empty($user_id)) {
+                $response['message'] = 'user id is required.';
+                $response['code'] = 201;
+            } else if (empty($product_id)) {
+                $response['message'] = 'Product Id is required.';
+                $response['code'] = 201;
+            }  else if (empty($comment)) {
+                $response['message'] = 'comment is required.';
+                $response['code'] = 201;
+            } else {
+                $curl_data = array(
+                    'user_id' =>$user_id,
+                    'product_id' =>$product_id,
+                    'comment' =>$comment,
+                );
+                 $inserted_id = $this->model->insertData('product_comment',$curl_data);
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
             }       
         }else {
             $response['message'] = 'Invalid Request';
