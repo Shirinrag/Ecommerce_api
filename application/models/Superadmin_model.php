@@ -8,7 +8,7 @@ class Superadmin_model extends CI_Model {
     
     public function get_product_on_search($search="",$fk_lang_id="")
     {
-        $this->db->select('*');
+        $this->db->select('product.*,product_gallery.img_url');
         $this->db->from('product');
         $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
         $this->db->or_like('product.product_name',$search);    
@@ -147,5 +147,15 @@ class Superadmin_model extends CI_Model {
         return $result;
     }
 
+    public function get_search_product($search='',$fk_lang_id="")
+    {
+        $this->db->select('product.product_id,product.product_name,product.product_price,product.image_name,');
+        $this->db->from('product');
+        $this->db->like('product.product_name',$search);  
+        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
 
 }

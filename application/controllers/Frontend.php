@@ -497,6 +497,7 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Product Id is required.';
                 $response['code'] = 201;
             }else{
+                $this->load->model('superadmin_model');
                  $product_details = $this->superadmin_model->product_details_on_id($product_id);
 
                
@@ -551,7 +552,7 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Language is required.';
                 $response['code'] = 201;
             }else{
-
+                $this->load->model('superadmin_model');
                 $product_details = $this->superadmin_model->get_product_on_search($search_keyword,$fk_lang_id);
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
@@ -646,6 +647,7 @@ class Frontend extends REST_Controller {
                 $response['code'] =201;
             }else{
                     $condition = array('contact_no' => $contact_no, 'otp' => $otp);
+                    $this->load->model('superadmin_model');
                     $response = $this->superadmin_model->verify_otp('op_user', $contact_no, $otp);
                     if($response['status']==1){
                         $user_login_data =array('contact_no' => $contact_no,);
@@ -821,6 +823,7 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             }
             else{
+                $this->load->model('superadmin_model');
                 $cart_data = $this->superadmin_model->get_cart_data($user_id);
 
                 foreach ($cart_data as $cart_data_key => $cart_data_row) {
@@ -876,6 +879,7 @@ class Frontend extends REST_Controller {
                 } else {
                     $message = "Removed From Cart Successfully.";
                 }
+                $this->load->model('superadmin_model');
                 $order_summary_info = $this->superadmin_model->get_order_summary_info($user_id);
                 $total = 0;
                 if(!empty($order_summary_info)){
@@ -917,9 +921,8 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'User Id is required.';
                 $response['code'] = 201;
             }else{
+                $this->load->model('superadmin_model');
                $whitelist_data = $this->superadmin_model->get_wishlist_data($user_id);
-
-
                foreach ($whitelist_data as $whitelist_data_key => $whitelist_data_row) {
                 $whitelist_data[$whitelist_data_key]['image_name'] = APPURL.$whitelist_data_row['image_name'];
 
@@ -962,9 +965,9 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'Item Removed Successfully.';
             }       
-        }else {
-            $response['message'] = 'Invalid Request';
-            $response['code'] = 204;
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
         }
         echo json_encode($response);
     }
@@ -997,9 +1000,41 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'success';
             }       
-        }else {
-            $response['message'] = 'Invalid Request';
-            $response['code'] = 204;
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function get_search_product_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+            $search_data = $this->input->post('search_data'); 
+            $fk_lang_id = $this->input->post('fk_lang_id'); 
+
+            if (empty($search_data)) {
+                $response['message'] = 'Search Data is required.';
+                $response['code'] = 201;
+            } else if (empty($fk_lang_id)) {
+                $response['message'] = 'Language Id is required.';
+                $response['code'] = 201;
+            } else {
+                $this->load->model('superadmin_model');
+                $product_data = $this->superadmin_model->get_search_product($search_data,$fk_lang_id);
+                foreach ($product_data as $product_data_key => $product_data_row) {
+                   $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                }
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
+                $response['product_data'] =$product_data;
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
         }
         echo json_encode($response);
     }
