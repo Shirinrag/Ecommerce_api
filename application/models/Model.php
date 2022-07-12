@@ -5,6 +5,14 @@ class Model extends CI_Model {
 		parent::__construct();
 	}
 	
+	public function display_where_record($table_name,$condition)
+    {
+        $query= $this->db->select('*')
+        ->from($table_name)
+        ->where($condition)
+        ->get();
+        return $query->result_array();
+    }
 	function getData($tableName, $where_data=array(), $where_in = array(),$fields='*'){
         try{
 			if (isset($tableName) && isset($where_data)) {
@@ -464,22 +472,33 @@ class Model extends CI_Model {
 		$this->db->delete($table_name,$where); 
         return TRUE;
 	}
-	
-	public function changeCmsStatus($tableName,$where)
-	{
-		$status=$this->getValue($tableName,'cms_admin_status',$where);
-		if ($status==1) {
-			$update_status=0;
-		} else {
-			$update_status=1;
-		}
-		$updateData=array('cms_admin_status'=>$update_status);
-		$this->db->trans_start();	
-		$query = $this->db->update($tableName, $updateData, $where);
-		$this->db->trans_complete();
+	public function check_exist($tablename="", $column="", $data="") {
+        $response = array();
+        $query = $this->db->get_where($tablename, $column);
+        if ($query->num_rows() > 0) {
+            $response['status'] = 1;
+            $response['message'] = 'Already Exist';
+            return $response;
+        } else {
+            $response['status'] = 0;
+            $response['message'] = 'New Data';
+            return $response;
+        }
+    }
 
-		$result = $query ? 1 : 0;
-		return $result;
-	}
+    function deleteData2($tableName, $whereData) {
+        if (isset($tableName) && isset($whereData)) {
+            $this->db->trans_start();
+            $this->db->delete($tableName, $whereData);
+            $this->db->trans_complete();
+            if ($this->db->affected_rows() > 0) { // returns 1 ( == true) if successfuly deleted
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
 }//class ends here	

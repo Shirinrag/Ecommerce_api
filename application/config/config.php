@@ -24,7 +24,7 @@ date_default_timezone_set('America/New_york');
 |
 */
 $config['base_url'] = 'http://localhost/stzsoft/Ecommerce_api/';
-// define("APPURL","http://localhost/EGtech/egtech_app/");
+define("APPURL","https://stzsoft.in/dev/");
 /*
 |--------------------------------------------------------------------------
 | Index File
