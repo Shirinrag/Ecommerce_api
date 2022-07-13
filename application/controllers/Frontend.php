@@ -139,36 +139,53 @@ class Frontend extends REST_Controller {
             }else{
                
                 $check_contact_no_count = $this->model->CountWhereRecord('op_user',array('contact_no'=>$contact_no,'status'=>'1'));
+
                 // echo '<pre>'; print_r($check_contact_no_count); exit;
                 if ($check_contact_no_count > 0) {
                     $response['message'] = 'Contact No is already exist.';
                     $response['code'] = 201;
                     $response['error_status']="contact";
                 } else {
-                        
-                        $getTermsConditionId = $this->model->selectWhereData('tbl_about_us',array('module'=>"1",'type'=>'1','is_deleted'=> '1'),array('*'),false,array('id' => 'desc'));
+                     if(!empty($email)){
+                         $check_contact_no_count = $this->model->CountWhereRecord('op_user',array('email'=>$email,'status'=>'1'));
+                         if ($check_contact_no_count > 0) {
+                            $response['message'] = 'Contact No is already exist.';
+                            $response['code'] = 201;
+                            $response['error_status']="contact";
+                        } else {
+                                $getTermsConditionId = $this->model->selectWhereData('tbl_about_us',array('module'=>"1",'type'=>'1','is_deleted'=> '1'),array('*'),false,array('id' => 'desc'));
                        
-                        $termsCondtnId = (string)count($getTermsConditionId) > 0 ? $getTermsConditionId[0]['id'] : 0;
+                                $termsCondtnId = (string)count($getTermsConditionId) > 0 ? $getTermsConditionId[0]['id'] : 0;
 
-                        $curl_data = array(
-                            'user_name' =>$user_name,
-                            'email' =>$email,
-                            'password'=>dec_enc('encrypt',$password),
-                            'contact_no'=>$contact_no,
-                            'role_id' => '2',
-                            'device_id' => $device_id,
-                            'device_type' => $device_type,
-                            'notifn_topic' => $contact_no . 'ecom',
-                            'terms_condition' => $terms_cond != '' ? $terms_cond : 1,
-                            'terms_conditn_id' => $terms_cond != '' ? $termsCondtnId : 0,
-                            'app_version' => $app_version,
-                            'app_build_no' => $app_build_no,
-                        );
-                        $inserted_id = $this->model->insertData('op_user',$curl_data);
+                                 $otp = generateOTP();
+                               
+                                $curl_data = array(
+                                    'user_name' =>$user_name,
+                                    'email' =>$email,
+                                    'password'=>dec_enc('encrypt',$password),
+                                    'contact_no'=>$contact_no,
+                                    'role_id' => '2',
+                                    'device_id' => $device_id,
+                                    'device_type' => $device_type,
+                                    'notifn_topic' => $contact_no . 'ecom',
+                                    'terms_condition' => $terms_cond != '' ? $terms_cond : 1,
+                                    'terms_conditn_id' => $terms_cond != '' ? $termsCondtnId : 0,
+                                    'app_version' => $app_version,
+                                    'app_build_no' => $app_build_no,
+                                    'otp'=>$otp
+                                );
+                                $inserted_id = $this->model->insertData('op_user',$curl_data);
 
-                        $response['code'] = REST_Controller::HTTP_OK;
-                        $response['status'] = true;
-                        $response['message'] = 'success';
+                                // $this->load->library('Smsglobal');
+                                // $message = "Your OTP is ".$otp;                       
+                                // $this->smsglobal->sms_send($contact_no,$message);
+
+                                $response['code'] = REST_Controller::HTTP_OK;
+                                $response['status'] = true;
+                                $response['message'] = 'success';
+                                $response['contact_no'] = $contact_no;
+                        }                        
+                     }                        
                 }    
             }   
             echo json_encode($response);
@@ -192,14 +209,21 @@ class Frontend extends REST_Controller {
                       "contact_no" => $contact_no,
                       "password" => dec_enc('encrypt',$password)
                     );
-                    // echo '<pre>'; print_r($login_credentials_data); exit;
                     $login_info = $this->model->selectWhereData('op_user',$login_credentials_data,'*');
                     if(!empty($login_info)){
+                         if ($login_info['otp_verify_status'] == 0) {
+                            $response['code'] = 205;
+                            $response['status'] = "failure";
+                            $response['message'] = 'Otp Not Verified';
+                            $response['contact_no'] = $login_info['contact_no'];
+                            $response['op_user_id'] = $login_info['op_user_id'];
+                        } else {
                             $response['code'] = REST_Controller::HTTP_OK;;
                             $response['status'] = true;
                             $response['message'] = 'success';
                             $response['data'] = $login_info;
                             $response['session_token'] = token_get();
+                        }
                     } else {
                         $response['code'] = 201;
                         $response['status'] = false;
