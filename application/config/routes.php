@@ -83,3 +83,4 @@ $route['delete-whislist']='Frontend/delete_whislist';
 $route['add-user-comment']='Frontend/add_user_comment';
 $route['get-all-address-list']='Frontend/get_all_address_list';
 $route['get-search-product']='Frontend/get_search_product';
+$route['category-data']='Frontend/category_data';

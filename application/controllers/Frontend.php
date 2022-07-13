@@ -92,7 +92,7 @@ class Frontend extends REST_Controller {
                         $best_selling[$best_selling_key]['image_name'] = APPURL.$best_selling_row['image_name'];
                       }
                   }
-                  $category = $this->model->selectWhereData('category', array('status'=>1),array('*'),false);
+                  $category = $this->model->selectWhereData('category', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
                   foreach ($category as $category_key => $category_row) {
                     $category[$category_key]['image_path'] = APPURL.$category_row['image_path'];
                   }
@@ -139,36 +139,53 @@ class Frontend extends REST_Controller {
             }else{
                
                 $check_contact_no_count = $this->model->CountWhereRecord('op_user',array('contact_no'=>$contact_no,'status'=>'1'));
+
                 // echo '<pre>'; print_r($check_contact_no_count); exit;
                 if ($check_contact_no_count > 0) {
                     $response['message'] = 'Contact No is already exist.';
                     $response['code'] = 201;
                     $response['error_status']="contact";
                 } else {
-                        
-                        $getTermsConditionId = $this->model->selectWhereData('tbl_about_us',array('module'=>"1",'type'=>'1','is_deleted'=> '1'),array('*'),false,array('id' => 'desc'));
+                     if(!empty($email)){
+                         $check_contact_no_count = $this->model->CountWhereRecord('op_user',array('email'=>$email,'status'=>'1'));
+                         if ($check_contact_no_count > 0) {
+                            $response['message'] = 'Contact No is already exist.';
+                            $response['code'] = 201;
+                            $response['error_status']="contact";
+                        } else {
+                                $getTermsConditionId = $this->model->selectWhereData('tbl_about_us',array('module'=>"1",'type'=>'1','is_deleted'=> '1'),array('*'),false,array('id' => 'desc'));
                        
-                        $termsCondtnId = (string)count($getTermsConditionId) > 0 ? $getTermsConditionId[0]['id'] : 0;
+                                $termsCondtnId = (string)count($getTermsConditionId) > 0 ? $getTermsConditionId[0]['id'] : 0;
 
-                        $curl_data = array(
-                            'user_name' =>$user_name,
-                            'email' =>$email,
-                            'password'=>dec_enc('encrypt',$password),
-                            'contact_no'=>$contact_no,
-                            'role_id' => '2',
-                            'device_id' => $device_id,
-                            'device_type' => $device_type,
-                            'notifn_topic' => $contact_no . 'ecom',
-                            'terms_condition' => $terms_cond != '' ? $terms_cond : 1,
-                            'terms_conditn_id' => $terms_cond != '' ? $termsCondtnId : 0,
-                            'app_version' => $app_version,
-                            'app_build_no' => $app_build_no,
-                        );
-                        $inserted_id = $this->model->insertData('op_user',$curl_data);
+                                 $otp = generateOTP();
+                               
+                                $curl_data = array(
+                                    'user_name' =>$user_name,
+                                    'email' =>$email,
+                                    'password'=>dec_enc('encrypt',$password),
+                                    'contact_no'=>$contact_no,
+                                    'role_id' => '2',
+                                    'device_id' => $device_id,
+                                    'device_type' => $device_type,
+                                    'notifn_topic' => $contact_no . 'ecom',
+                                    'terms_condition' => $terms_cond != '' ? $terms_cond : 1,
+                                    'terms_conditn_id' => $terms_cond != '' ? $termsCondtnId : 0,
+                                    'app_version' => $app_version,
+                                    'app_build_no' => $app_build_no,
+                                    'otp'=>$otp
+                                );
+                                $inserted_id = $this->model->insertData('op_user',$curl_data);
 
-                        $response['code'] = REST_Controller::HTTP_OK;
-                        $response['status'] = true;
-                        $response['message'] = 'success';
+                                // $this->load->library('Smsglobal');
+                                // $message = "Your OTP is ".$otp;                       
+                                // $this->smsglobal->sms_send($contact_no,$message);
+
+                                $response['code'] = REST_Controller::HTTP_OK;
+                                $response['status'] = true;
+                                $response['message'] = 'success';
+                                $response['contact_no'] = $contact_no;
+                        }                        
+                     }                        
                 }    
             }   
             echo json_encode($response);
@@ -192,14 +209,21 @@ class Frontend extends REST_Controller {
                       "contact_no" => $contact_no,
                       "password" => dec_enc('encrypt',$password)
                     );
-                    // echo '<pre>'; print_r($login_credentials_data); exit;
                     $login_info = $this->model->selectWhereData('op_user',$login_credentials_data,'*');
                     if(!empty($login_info)){
+                         if ($login_info['otp_verify_status'] == 0) {
+                            $response['code'] = 205;
+                            $response['status'] = "failure";
+                            $response['message'] = 'Otp Not Verified';
+                            $response['contact_no'] = $login_info['contact_no'];
+                            $response['op_user_id'] = $login_info['op_user_id'];
+                        } else {
                             $response['code'] = REST_Controller::HTTP_OK;;
                             $response['status'] = true;
                             $response['message'] = 'success';
                             $response['data'] = $login_info;
                             $response['session_token'] = token_get();
+                        }
                     } else {
                         $response['code'] = 201;
                         $response['status'] = false;
@@ -469,14 +493,20 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Product Id is required.';
                 $response['code'] = 201;
             }else{
-                $curl_data=array(
-                    'user_id'=>$user_id,
-                    'product_id'=>$product_id,
-                );
-                $this->model->insertData('wishlist',$curl_data);
-                 $response['code'] = REST_Controller::HTTP_OK;
-                    $response['status'] = true;
-                    $response['message'] = 'success';
+                $check_wishlist_count = $this->model->CountWhereRecord('wishlist',array('user_id'=>$user_id,'product_id'=>$product_id));
+                 if ($check_wishlist_count > 0) {
+                            $response['message'] = 'Already exist.';
+                            $response['code'] = 201;                        
+                } else {
+                        $curl_data=array(
+                            'user_id'=>$user_id,
+                            'product_id'=>$product_id,
+                        );
+                        $this->model->insertData('wishlist',$curl_data);
+                        $response['code'] = REST_Controller::HTTP_OK;
+                        $response['status'] = true;
+                        $response['message'] = 'success';
+                }
             }           
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -922,22 +952,22 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             }else{
                 $this->load->model('superadmin_model');
-               $whitelist_data = $this->superadmin_model->get_wishlist_data($user_id);
-               foreach ($whitelist_data as $whitelist_data_key => $whitelist_data_row) {
-                $whitelist_data[$whitelist_data_key]['image_name'] = APPURL.$whitelist_data_row['image_name'];
+               $wishlist_data = $this->superadmin_model->get_wishlist_data($user_id);
+               foreach ($wishlist_data as $wishlist_data_key => $wishlist_data_row) {
+                $wishlist_data[$wishlist_data_key]['image_name'] = APPURL.$wishlist_data_row['image_name'];
 
-                    $whislist_data_img_url = explode(',',$whitelist_data_row['img_url']);
+                    $whislist_data_img_url = explode(',',$wishlist_data_row['img_url']);
                     foreach ($whislist_data_img_url as $whislist_data_img_url_key => $whislist_data_img_url_row) {
                             $whislist_data_img_url1[]= APPURL.$whislist_data_img_url_row;   
                             
                       }
-                       $whitelist_data[$whitelist_data_key]['img_url']= implode(',',$whislist_data_img_url1);
+                       $wishlist_data[$wishlist_data_key]['img_url']= implode(',',$whislist_data_img_url1);
                   
                }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['message'] = 'success';
                 $response['status'] = true;  
-                $response['whitelist_data'] = $whitelist_data;  
+                $response['wishlist_data'] = $wishlist_data;  
             }                 
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -1012,18 +1042,14 @@ class Frontend extends REST_Controller {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
         if($validate){
-            $search_data = $this->input->post('search_data'); 
-            $fk_lang_id = $this->input->post('fk_lang_id'); 
+              $fk_lang_id = $this->input->post('fk_lang_id'); 
 
-            if (empty($search_data)) {
-                $response['message'] = 'Search Data is required.';
-                $response['code'] = 201;
-            } else if (empty($fk_lang_id)) {
+             if (empty($fk_lang_id)) {
                 $response['message'] = 'Language Id is required.';
                 $response['code'] = 201;
             } else {
                 $this->load->model('superadmin_model');
-                $product_data = $this->superadmin_model->get_search_product($search_data,$fk_lang_id);
+                $product_data = $this->superadmin_model->get_search_product($fk_lang_id);
                 foreach ($product_data as $product_data_key => $product_data_row) {
                    $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
                 }
@@ -1031,6 +1057,33 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'success';
                 $response['product_data'] =$product_data;
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function category_data_post()
+    {
+       $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+              $fk_lang_id = $this->input->post('fk_lang_id'); 
+
+             if (empty($fk_lang_id)) {
+                $response['message'] = 'Language Id is required.';
+                $response['code'] = 201;
+            } else {
+                $category = $this->model->selectWhereData('category', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
+                  foreach ($category as $category_key => $category_row) {
+                    $category[$category_key]['image_path'] = APPURL.$category_row['image_path'];
+                  }
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
+                $response['category'] =$category;
             }       
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
