@@ -82,24 +82,29 @@ class Superadmin_model extends CI_Model {
         return $response;
     }
 
-    public function get_cart_data($user_id="")
+    public function get_cart_data($user_id="",$fk_lang_id="")
     {
-       $this->db->select('cart.*,product.*');
+       $this->db->select('cart.*,COUNT(cart.qty) as cart_qty_count, carproduct.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
        $this->db->from('cart');
        $this->db->join('product','cart.product_id=product.product_id','left');
+       $this->db->join('inventory','inventory.product_id=product.product_id','left');
+
        $this->db->where('cart.user_id',$user_id);
+       $this->db->where('product.fk_lang_id',$fk_lang_id);
        $query = $this->db->get();
         $result = $query->result_array();
         return $result;
     }
 
     public function get_order_summary_info($user_id=''){
-        $this->db->select('cart.cart_id,cart.product_id as cart_product_id,cart.qty,
-        product.*');
+        $this->db->select('cart.cart_id,cart.product_id as cart_product_id,cart.qty,COUNT(cart.qty) as cart_qty_count,
+        product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
         $this->db->from('cart');      
         $this->db->join('product','product.product_id=cart.product_id', 'left');
+       $this->db->join('inventory','inventory.product_id=product.product_id','left');
         $this->db->where('cart.user_id',$user_id);
         $this->db->where('product.status','1');
+        $this->db->where('inventory.status','1');
         $this->db->order_by('cart.cart_id','DESC'); 
         $query = $this->db->get();
         $result = $query->result_array();
@@ -108,14 +113,16 @@ class Superadmin_model extends CI_Model {
 
     public function product_details_on_id($product_id='')
     {
-        $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
+        $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name,inventory.id as inventory_id,inventory.qty as inventory_qty');
         $this->db->from('product');      
         $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
         $this->db->join('category','product.category_id=category.category_id','left');
         $this->db->join('subcategory','product.sub_category_id=subcategory.sub_category_id','left');
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
+         $this->db->join('inventory','inventory.product_id=product.product_id','left');
         $this->db->where('product.product_id',$product_id);
         $this->db->where('product.status','1');
+        $this->db->where('inventory.status','1');
         $this->db->group_by('product_gallery.product_id');
         $query = $this->db->get();
         $result = $query->row_array();
@@ -124,15 +131,18 @@ class Superadmin_model extends CI_Model {
 
     public function related_product_details_on_id($product_id='')
     {
-         $this->db->select('product_relative.rel_product_id,product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
+         $this->db->select('product_relative.rel_product_id,product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name,inventory.id as inventory_id,inventory.qty as inventory_qty');
         $this->db->from('product_relative');      
         $this->db->join('product','product_relative.product_id=product.product_id','left');
         $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
         $this->db->join('category','product.category_id=category.category_id','left');
         $this->db->join('subcategory','product.sub_category_id=subcategory.sub_category_id','left');
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
+         $this->db->join('inventory','inventory.product_id=product.product_id','left');
+
         $this->db->where('product.product_id',$product_id);
         $this->db->where('product.status','1');
+        $this->db->where('inventory.status','1');
         $this->db->group_by('product.product_id');
         $query = $this->db->get();
         $result = $query->result_array();
@@ -162,5 +172,58 @@ class Superadmin_model extends CI_Model {
         $result = $query->result_array();
         return $result;
     }
+
+    public function get_all_product_data($fk_lang_id="")
+    {
+        $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->from('product');
+        $this->db->join('inventory','inventory.product_id=product.product_id','left');
+        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        $this->db->where('inventory.status','1');
+        $this->db->where('product.status','1');
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+    public function get_all_popular_product_data($fk_lang_id="")
+    {
+        $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->from('product');
+        $this->db->join('inventory','inventory.product_id=product.product_id','left');
+        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        $this->db->where('product.popular','1'); 
+         $this->db->where('product.status','1');
+        $this->db->where('inventory.status','1'); 
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+    public function get_all_featured_product_data($fk_lang_id="")
+    {
+        $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->from('product');
+        $this->db->join('inventory','inventory.product_id=product.product_id','left');
+        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        $this->db->where('product.featured','1');  
+         $this->db->where('product.status','1');
+        $this->db->where('inventory.status','1');
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+     public function get_all_best_selling_product_data($fk_lang_id="")
+    {
+        $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->from('product');
+        $this->db->join('inventory','inventory.product_id=product.product_id','left');
+        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        $this->db->where('product.best_selling',1);  
+         $this->db->where('product.status','1');
+        $this->db->where('inventory.status','1');
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
+
 
 }

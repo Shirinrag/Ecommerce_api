@@ -54,21 +54,23 @@ class Frontend extends REST_Controller {
       $validate = validateToken();
       if ($validate) {
             $fk_lang_id = $this->input->post('fk_lang_id');
+            $user_id = $this->input->post('user_id');
             if(empty($fk_lang_id)){
                   $response['message'] ="Language Name is required";
                   $response['code'] = 201;
             }else{
+                $this->load->model('superadmin_model');
                   $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
                   foreach ($slider as $slider_key => $slider_row) {
                     $slider[$slider_key]['img_url'] = APPURL.$slider_row['img_url'];
                   }
-                  $product_data = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
+                  $product_data = $this->superadmin_model->get_all_product_data($fk_lang_id);
 
                    foreach ($product_data as $product_data_key => $product_data_row) {
                     $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
                   }
 
-                  $popular = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'popular'=>'1'),array('*'),false);
+                  $popular = $this->superadmin_model->get_all_popular_product_data($fk_lang_id);
                   if(empty($popular)){
                     $popular=[];
                   }else{
@@ -76,7 +78,7 @@ class Frontend extends REST_Controller {
                         $popular[$popular_key]['image_name'] = APPURL.$popular_row['image_name'];
                       }
                   }
-                  $featured = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'featured'=>'1'),array('*'),false);
+                  $featured = $this->superadmin_model->get_all_featured_product_data($fk_lang_id);
                    if(empty($featured)){
                     $featured=[];
                   }else{
@@ -84,7 +86,7 @@ class Frontend extends REST_Controller {
                         $featured[$featured_key]['image_name'] = APPURL.$featured_row['image_name'];
                       }
                   }
-                  $best_selling = $this->model->selectWhereData('product', array('status'=>1,'fk_lang_id'=>$fk_lang_id,'best_selling'=>'1'),array('*'),false);
+                  $best_selling =  $this->superadmin_model->get_all_best_selling_product_data($fk_lang_id);
                   if(empty($best_selling)){
                     $best_selling=[];
                   }else{
@@ -96,6 +98,11 @@ class Frontend extends REST_Controller {
                   foreach ($category as $category_key => $category_row) {
                     $category[$category_key]['image_path'] = APPURL.$category_row['image_path'];
                   }
+                  
+                  if(!empty($user_id)){
+                       $wishlist_count = $this->model->CountWhereInRecord('wishlist',array('user_id'=>$user_id,'status'=>'1'));
+                       $cart_count = $this->model->CountWhereInRecord('cart',array('user_id'=>$user_id,'status'=>'1'));
+                  }
 
                   $response['code'] = REST_Controller::HTTP_OK;
                   $response['status'] = true;
@@ -106,6 +113,10 @@ class Frontend extends REST_Controller {
                   $response['best_selling']=$best_selling;
                   $response['product_data'] = $product_data;
                   $response['category'] = $category;
+                  if(!empty($user_id)){
+                       $response['wishlist_count'] = $wishlist_count;
+                       $response['cart_count'] = $cart_count;
+                  }
             }
       }else {
           $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -523,6 +534,7 @@ class Frontend extends REST_Controller {
         if($validate){  
             $product_id = $this->input->post('product_id');
             $fk_lang_id = $this->input->post('fk_lang_id');
+            $user_id = $this->input->post('user_id');
             if(empty($product_id)){
                 $response['message'] = 'Product Id is required.';
                 $response['code'] = 201;
@@ -551,6 +563,11 @@ class Frontend extends REST_Controller {
                        $related_product_details[$related_product_details_key]['img_url']= implode(',',$related_product_img_url1);
                      
                  }
+
+                 if(!empty($user_id)){
+                       $wishlist_count = $this->model->CountWhereInRecord('wishlist',array('user_id'=>$user_id,'status'=>'1'));
+                       $cart_count = $this->model->CountWhereInRecord('cart',array('user_id'=>$user_id,'status'=>'1'));
+                  }
                  
 
 
@@ -559,6 +576,10 @@ class Frontend extends REST_Controller {
                     $response['message'] = 'success';
                     $response['product_details'] =$product_details;
                     $response['related_product_details'] =$related_product_details;
+                    if(!empty($user_id)){
+                        $response['wishlist_count'] =$wishlist_count;
+                        $response['cart_count'] =$cart_count;
+                    }
 
             }           
         } else {
@@ -602,6 +623,7 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if ($validate) { 
             $fk_lang_id = $this->input->post('fk_lang_id');
+            $user_id = $this->input->post('user_id');
             if(empty($fk_lang_id)){
                 $response['message'] = 'Language is required';
                 $response['code'] =201;
@@ -620,10 +642,19 @@ class Frontend extends REST_Controller {
                         }
                     }
 
+                    if(!empty($user_id)){
+                       $wishlist_count = $this->model->CountWhereInRecord('wishlist',array('user_id'=>$user_id,'status'=>'1'));
+                       $cart_count = $this->model->CountWhereInRecord('cart',array('user_id'=>$user_id,'status'=>'1'));
+                  }
+
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
                     $response['cat_data'] = $cat_data;
+                     if(!empty($user_id)){
+                        $response['wishlist_count'] = $wishlist_count;
+                        $response['cart_count'] = $cart_count;
+                    }
             }
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -785,6 +816,7 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             }else{ 
                 $cart_query = $this->model->selectWhereData('cart',array('user_id'=>$user_id,'product_id'=>$product_id),array('cart_id','qty'));
+
                 if(empty($cart_query['cart_id'])){
                     $insert_data = array(
                         'user_id'=>$user_id,
@@ -848,17 +880,22 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if($validate){
             $user_id = $this->input->post('user_id'); 
+            $fk_lang_id = $this->input->post('fk_lang_id'); 
             if (empty($user_id)) {
                 $response['message'] = 'user id is required.';
+                $response['code'] = 201;
+            }else if (empty($fk_lang_id)) {
+                $response['message'] = 'Language Id is required.';
                 $response['code'] = 201;
             }
             else{
                 $this->load->model('superadmin_model');
-                $cart_data = $this->superadmin_model->get_cart_data($user_id);
+                $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
 
                 foreach ($cart_data as $cart_data_key => $cart_data_row) {
                         $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_price'] * $cart_data_row['qty'];
                         $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
+                        $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
                 }
 
 
@@ -891,46 +928,50 @@ class Frontend extends REST_Controller {
             }  else if (empty($cart_id)) {
                 $response['message'] = 'Cart Id is required.';
                 $response['code'] = 201;
-            } else{
-                
-            
+            } else{              
                 $cart_data = $this->model->selectwhereData('cart',array('cart_id'=>$cart_id),array('*'));
-                $previous_quantity = $cart_data['qty'];
-                if(!empty($cart_data) && !empty($quantity)){
-                    $update_data = array(
-                        'qty'=>$quantity,     
-                    );
-                    $cart_data = $this->model->updateData('cart',$update_data,array('cart_id'=>$cart_id));  
-                } else {
-                    $this->model->deleteData2('cart',array('cart_id' => $cart_id)); 
+                $inventory_quantity = $this->model->selectwhereData('inventory',array('product_id'=>$product_id,'status'=>'1'),array('qty'));
+                if($quantity > $inventory_quantity['qty']){
+                    $message = "Out of Stock";
+                }else{
+                    $previous_quantity = $cart_data['qty'];
+                    if(!empty($cart_data) && !empty($quantity)){
+                        $update_data = array(
+                            'qty'=>$quantity,     
+                        );
+                        $cart_data = $this->model->updateData('cart',$update_data,array('cart_id'=>$cart_id));  
+                    } else {
+                        $this->model->deleteData2('cart',array('cart_id' => $cart_id)); 
+                    }
+                    if($quantity > $previous_quantity){
+                        $message = "Added To Cart Successfully.";
+                    } else {
+                        $message = "Removed From Cart Successfully.";
+                    }
+                    $this->load->model('superadmin_model');
+                    $order_summary_info = $this->superadmin_model->get_order_summary_info($user_id);
+                    $total = 0;
+                    if(!empty($order_summary_info)){
+                        foreach ($order_summary_info as $order_summary_info_key => $order_summary_info_row) {
+                            $subtotal = ($order_summary_info_row['qty']*$order_summary_info_row['product_price']);
+                           
+                            $order_summary_info[$order_summary_info_key]['subtotal'] = custom_number_format($subtotal,2);
+                          
+                            $total = $total+$subtotal;
+                        }                  
+                        $response['code'] = REST_Controller::HTTP_OK;;
+                        $response['status'] = true;
+                        $response['message'] = $message;
+                        $response['order_summary_info'] = $order_summary_info;
+                        $response['total'] = custom_number_format($total,2);
+                        $response['cart_count'] = get_user_cart_count($user_id); 
+                    } else {
+                        $response['message'] = 'Cart is empty.';
+                        $response['code'] = 201;
+                        $response['cart_count'] = get_user_cart_count($user_id);
+                    }
                 }
-                if($quantity > $previous_quantity){
-                    $message = "Added To Cart Successfully.";
-                } else {
-                    $message = "Removed From Cart Successfully.";
-                }
-                $this->load->model('superadmin_model');
-                $order_summary_info = $this->superadmin_model->get_order_summary_info($user_id);
-                $total = 0;
-                if(!empty($order_summary_info)){
-                    foreach ($order_summary_info as $order_summary_info_key => $order_summary_info_row) {
-                        $subtotal = ($order_summary_info_row['qty']*$order_summary_info_row['product_price']);
-                       
-                        $order_summary_info[$order_summary_info_key]['subtotal'] = custom_number_format($subtotal,2);
-                      
-                        $total = $total+$subtotal;
-                    }                  
-                    $response['code'] = REST_Controller::HTTP_OK;;
-                    $response['status'] = true;
-                    $response['message'] = $message;
-                    $response['order_summary_info'] = $order_summary_info;
-                    $response['total'] = custom_number_format($total,2);
-                    $response['cart_count'] = get_user_cart_count($user_id); 
-                } else {
-                    $response['message'] = 'Cart is empty.';
-                    $response['code'] = 201;
-                    $response['cart_count'] = get_user_cart_count($user_id);
-                }
+                
             }       
         }else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -953,6 +994,7 @@ class Frontend extends REST_Controller {
             }else{
                 $this->load->model('superadmin_model');
                $wishlist_data = $this->superadmin_model->get_wishlist_data($user_id);
+                $wishlist_count = $this->model->CountWhereInRecord('wishlist',array('user_id'=>$user_id,'status'=>'1'));
                foreach ($wishlist_data as $wishlist_data_key => $wishlist_data_row) {
                 $wishlist_data[$wishlist_data_key]['image_name'] = APPURL.$wishlist_data_row['image_name'];
 
@@ -968,6 +1010,7 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'success';
                 $response['status'] = true;  
                 $response['wishlist_data'] = $wishlist_data;  
+                $response['wishlist_count'] = $wishlist_count;  
             }                 
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
