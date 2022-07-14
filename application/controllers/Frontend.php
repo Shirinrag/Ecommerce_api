@@ -878,6 +878,8 @@ class Frontend extends REST_Controller {
                         $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['qty'];
                         $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
                         $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
+                        $sub_total[]= $cart_data[$cart_data_key]['cartPrice'];
+                       
                 }
 
 
