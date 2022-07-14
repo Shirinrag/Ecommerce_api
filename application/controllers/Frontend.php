@@ -560,8 +560,7 @@ class Frontend extends REST_Controller {
                             $related_product_img_url1[]= APPURL.$related_product_img_url_row;   
                             
                       }
-                       $related_product_details[$related_product_details_key]['img_url']= implode(',',$related_product_img_url1);
-                     
+                       $related_product_details[$related_product_details_key]['img_url']= implode(',',$related_product_img_url1);                     
                  }
 
                  if(!empty($user_id)){
