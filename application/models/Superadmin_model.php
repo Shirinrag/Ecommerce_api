@@ -84,11 +84,9 @@ class Superadmin_model extends CI_Model {
 
     public function get_cart_data($user_id="",$fk_lang_id="")
     {
-       $this->db->select('cart.*,COUNT(cart.qty) as cart_qty_count, carproduct.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+       $this->db->select('cart.*,COUNT(cart.qty) as cart_qty_count,product.*');
        $this->db->from('cart');
        $this->db->join('product','cart.product_id=product.product_id','left');
-       $this->db->join('inventory','inventory.product_id=product.product_id','left');
-
        $this->db->where('cart.user_id',$user_id);
        $this->db->where('product.fk_lang_id',$fk_lang_id);
        $query = $this->db->get();
@@ -213,6 +211,4 @@ class Superadmin_model extends CI_Model {
         $result = $query->result_array();
         return $result;
     }
-
-
 }
