@@ -495,7 +495,7 @@ class Frontend extends REST_Controller {
             }else{
                 $check_wishlist_count = $this->model->CountWhereRecord('wishlist',array('user_id'=>$user_id,'product_id'=>$product_id));
                  if ($check_wishlist_count > 0) {
-                            $response['message'] = 'Already exist.';
+                            $response['message'] = 'Product Already exist.';
                             $response['code'] = 201;                        
                 } else {
                         $curl_data=array(
@@ -505,7 +505,7 @@ class Frontend extends REST_Controller {
                         $this->model->insertData('wishlist',$curl_data);
                         $response['code'] = REST_Controller::HTTP_OK;
                         $response['status'] = true;
-                        $response['message'] = 'success';
+                        $response['message'] = 'Added to Wishlist';
                 }
             }           
         } else {
