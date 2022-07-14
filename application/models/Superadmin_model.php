@@ -113,16 +113,14 @@ class Superadmin_model extends CI_Model {
 
     public function product_details_on_id($product_id='')
     {
-        $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
         $this->db->from('product');      
         $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
         $this->db->join('category','product.category_id=category.category_id','left');
         $this->db->join('subcategory','product.sub_category_id=subcategory.sub_category_id','left');
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
-         $this->db->join('inventory','inventory.product_id=product.product_id','left');
         $this->db->where('product.product_id',$product_id);
         $this->db->where('product.status','1');
-        $this->db->where('inventory.status','1');
         $this->db->group_by('product_gallery.product_id');
         $query = $this->db->get();
         $result = $query->row_array();
@@ -131,18 +129,16 @@ class Superadmin_model extends CI_Model {
 
     public function related_product_details_on_id($product_id='')
     {
-         $this->db->select('product_relative.rel_product_id,product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name,inventory.id as inventory_id,inventory.qty as inventory_qty');
+         $this->db->select('product_relative.rel_product_id,product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
         $this->db->from('product_relative');      
         $this->db->join('product','product_relative.product_id=product.product_id','left');
         $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
         $this->db->join('category','product.category_id=category.category_id','left');
         $this->db->join('subcategory','product.sub_category_id=subcategory.sub_category_id','left');
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
-         $this->db->join('inventory','inventory.product_id=product.product_id','left');
 
         $this->db->where('product.product_id',$product_id);
         $this->db->where('product.status','1');
-        $this->db->where('inventory.status','1');
         $this->db->group_by('product.product_id');
         $query = $this->db->get();
         $result = $query->result_array();
