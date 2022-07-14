@@ -98,12 +98,6 @@ class Frontend extends REST_Controller {
                   foreach ($category as $category_key => $category_row) {
                     $category[$category_key]['image_path'] = APPURL.$category_row['image_path'];
                   }
-                  
-                  if(!empty($user_id)){
-                       $wishlist_count = $this->model->CountWhereInRecord('wishlist',array('user_id'=>$user_id,'status'=>'1'));
-                       $cart_count = $this->model->CountWhereInRecord('cart',array('user_id'=>$user_id,'status'=>'1'));
-                  }
-
                   $response['code'] = REST_Controller::HTTP_OK;
                   $response['status'] = true;
                   $response['message'] = 'success';
@@ -114,8 +108,8 @@ class Frontend extends REST_Controller {
                   $response['product_data'] = $product_data;
                   $response['category'] = $category;
                   if(!empty($user_id)){
-                       $response['wishlist_count'] = $wishlist_count;
-                       $response['cart_count'] = $cart_count;
+                        $response['cart_count'] = get_user_cart_count($user_id);
+                        $response['wishlist_count'] = get_user_wishlist_count($user_id);
                   }
             }
       }else {
@@ -562,23 +556,16 @@ class Frontend extends REST_Controller {
                       }
                        $related_product_details[$related_product_details_key]['img_url']= implode(',',$related_product_img_url1);                     
                  }
-
-                 if(!empty($user_id)){
-                       $wishlist_count = $this->model->CountWhereInRecord('wishlist',array('user_id'=>$user_id,'status'=>'1'));
-                       $cart_count = $this->model->CountWhereInRecord('cart',array('user_id'=>$user_id,'status'=>'1'));
-                  }
-                 
-
-
+     
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
                     $response['product_details'] =$product_details;
                     $response['related_product_details'] =$related_product_details;
-                    if(!empty($user_id)){
-                        $response['wishlist_count'] =$wishlist_count;
-                        $response['cart_count'] =$cart_count;
-                    }
+                   if(!empty($user_id)){
+                        $response['cart_count'] = get_user_cart_count($user_id);
+                        $response['wishlist_count'] = get_user_wishlist_count($user_id);
+                  }
 
             }           
         } else {
@@ -641,18 +628,14 @@ class Frontend extends REST_Controller {
                         }
                     }
 
-                    if(!empty($user_id)){
-                       $wishlist_count = $this->model->CountWhereInRecord('wishlist',array('user_id'=>$user_id,'status'=>'1'));
-                       $cart_count = $this->model->CountWhereInRecord('cart',array('user_id'=>$user_id,'status'=>'1'));
-                  }
 
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
                     $response['cat_data'] = $cat_data;
-                     if(!empty($user_id)){
-                        $response['wishlist_count'] = $wishlist_count;
-                        $response['cart_count'] = $cart_count;
+                    if(!empty($user_id)){
+                        $response['cart_count'] = get_user_cart_count($user_id);
+                        $response['wishlist_count'] = get_user_wishlist_count($user_id);
                     }
             }
         } else {
@@ -826,7 +809,7 @@ class Frontend extends REST_Controller {
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'Added To Cart Successfully.';
-                    $response['id'] = $cart_id;
+                    $response['id'] = (string)$cart_id;
                     $response['cart_count'] = get_user_cart_count($user_id);
                 } else {
                     $updated_quantity = $cart_query['qty']+1;
@@ -930,6 +913,7 @@ class Frontend extends REST_Controller {
             } else{              
                 $cart_data = $this->model->selectwhereData('cart',array('cart_id'=>$cart_id),array('*'));
                 $inventory_quantity = $this->model->selectwhereData('inventory',array('product_id'=>$product_id,'status'=>'1'),array('qty'));
+                // echo '<pre>'; print_r($inventory_quantity); exit;
                 if($quantity > $inventory_quantity['qty']){
                     $message = "Out of Stock";
                 }else{
