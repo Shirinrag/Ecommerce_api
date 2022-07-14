@@ -175,11 +175,9 @@ class Superadmin_model extends CI_Model {
 
     public function get_all_product_data($fk_lang_id="")
     {
-        $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->join('inventory','inventory.product_id=product.product_id','left');
-        $this->db->where('product.fk_lang_id',$fk_lang_id);  
-        $this->db->where('inventory.status','1');
+        $this->db->where('product.fk_lang_id',$fk_lang_id);        
         $this->db->where('product.status','1');
         $query = $this->db->get();
         $result = $query->result_array();
@@ -187,26 +185,22 @@ class Superadmin_model extends CI_Model {
     }
     public function get_all_popular_product_data($fk_lang_id="")
     {
-        $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->join('inventory','inventory.product_id=product.product_id','left');
         $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $this->db->where('product.popular','1'); 
          $this->db->where('product.status','1');
-        $this->db->where('inventory.status','1'); 
         $query = $this->db->get();
         $result = $query->result_array();
         return $result;
     }
     public function get_all_featured_product_data($fk_lang_id="")
     {
-        $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->join('inventory','inventory.product_id=product.product_id','left');
         $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $this->db->where('product.featured','1');  
          $this->db->where('product.status','1');
-        $this->db->where('inventory.status','1');
         $query = $this->db->get();
         $result = $query->result_array();
         return $result;
@@ -215,11 +209,10 @@ class Superadmin_model extends CI_Model {
     {
         $this->db->select('product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
         $this->db->from('product');
-        $this->db->join('inventory','inventory.product_id=product.product_id','left');
         $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $this->db->where('product.best_selling',1);  
          $this->db->where('product.status','1');
-        $this->db->where('inventory.status','1');
+    
         $query = $this->db->get();
         $result = $query->result_array();
         return $result;
