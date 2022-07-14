@@ -892,7 +892,7 @@ class Frontend extends REST_Controller {
                 $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
 
                 foreach ($cart_data as $cart_data_key => $cart_data_row) {
-                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_price'] * $cart_data_row['qty'];
+                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['qty'];
                         $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
                         $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
                 }
@@ -1126,6 +1126,44 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'success';
                 $response['category'] =$category;
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function check_out_api()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+              $fk_lang_id = $this->input->post('fk_lang_id'); 
+              $user_id = $this->input->post('user_id'); 
+
+             if (empty($fk_lang_id)) {
+                $response['message'] = 'Language Id is required.';
+                $response['code'] = 201;
+            }else if (empty($user_id)) {
+                $response['message'] = 'User Id is required.';
+                $response['code'] = 201;
+            } else {
+                $this->load->model('superadmin_model');
+                $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
+                foreach ($cart_data as $cart_data_key => $cart_data_row) {
+                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['qty'];
+                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
+                        $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
+                }
+
+
+                $user_address = $this->model->selectWhereData('user_delivery_address',array('user_id'=>$user_id,'status'=>'1'),array('*'),false);
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
+                $response['cart_product_details'] =$cart_data;
+                $response['user_address'] =$user_address;
             }       
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
