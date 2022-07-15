@@ -875,8 +875,8 @@ class Frontend extends REST_Controller {
                 $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
 
                 foreach ($cart_data as $cart_data_key => $cart_data_row) {
-                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['qty'];
-                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
+                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['cart_qty'];
+                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['cart_qty'];
                         $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
                         $sub_total[]= $cart_data[$cart_data_key]['cartPrice'];
                        
@@ -887,6 +887,7 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'success';
                 $response['status'] = true;  
                 $response['cart_data'] = $cart_data;  
+                $response['sub_total'] = array_sum($sub_total);  
             }       
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
