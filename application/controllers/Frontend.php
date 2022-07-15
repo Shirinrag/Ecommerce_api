@@ -534,7 +534,7 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             }else{
                 $this->load->model('superadmin_model');
-                 $product_details = $this->superadmin_model->product_details_on_id($product_id);
+                 $product_details = $this->superadmin_model->product_details_on_id($product_id,$fk_lang_id);
 
                
                     $product_details['image_name'] = APPURL.$product_details['image_name'];
@@ -545,7 +545,7 @@ class Frontend extends REST_Controller {
                       }
                       $product_details['img_url']= implode(',',$img_url1);
 
-                      $related_product_details = $this->superadmin_model->related_product_details_on_id($product_id);
+                      $related_product_details = $this->superadmin_model->related_product_details_on_id($product_id,$fk_lang_id);
                         foreach ($related_product_details as $related_product_details_key => $related_product_details_row) {
                        $related_product_details[$related_product_details_key]['image_name'] = APPURL.$related_product_details_row['image_name'];
 

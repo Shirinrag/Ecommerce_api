@@ -111,7 +111,7 @@ class Superadmin_model extends CI_Model {
         return $result;
     }
 
-    public function product_details_on_id($product_id='')
+    public function product_details_on_id($product_id='',$fk_lang_id="")
     {
         $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
         $this->db->from('product');      
@@ -120,6 +120,7 @@ class Superadmin_model extends CI_Model {
         $this->db->join('subcategory','product.sub_category_id=subcategory.sub_category_id','left');
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
         $this->db->where('product.product_id',$product_id);
+        $this->db->where('product.fk_lang_id',$fk_lang_id);
         $this->db->where('product.status','1');
         $this->db->group_by('product_gallery.product_id');
         $query = $this->db->get();
@@ -127,7 +128,7 @@ class Superadmin_model extends CI_Model {
         return $result;
     }
 
-    public function related_product_details_on_id($product_id='')
+    public function related_product_details_on_id($product_id='',$fk_lang_id="")
     {
          $this->db->select('product_relative.rel_product_id,product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
         $this->db->from('product_relative');      
@@ -138,6 +139,7 @@ class Superadmin_model extends CI_Model {
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
 
         $this->db->where('product.product_id',$product_id);
+        $this->db->where('product.fk_lang_id',$fk_lang_id);
         $this->db->where('product.status','1');
         $this->db->group_by('product.product_id');
         $query = $this->db->get();
