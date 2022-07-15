@@ -84,23 +84,25 @@ class Superadmin_model extends CI_Model {
 
     public function get_cart_data($user_id="",$fk_lang_id="")
     {
-       $this->db->select('cart.*,product.*');
+       $this->db->select('cart.*,cart.qty as cart_qty,product.*');
        $this->db->from('cart');
        $this->db->join('product','cart.product_id=product.product_id','left');
        $this->db->where('cart.user_id',$user_id);
        $this->db->where('product.fk_lang_id',$fk_lang_id);
+        $this->db->where('cart.status','1');
        $query = $this->db->get();
         $result = $query->result_array();
         return $result;
     }
 
     public function get_order_summary_info($user_id=''){
-        $this->db->select('cart.cart_id,cart.product_id as cart_product_id,cart.qty,COUNT(cart.qty) as cart_qty_count,
-        product.*,inventory.id as inventory_id,inventory.qty as inventory_qty');
+        $this->db->select('cart.cart_id,cart.product_id as cart_product_id,cart.qty,
+        product.*');
         $this->db->from('cart');      
         $this->db->join('product','product.product_id=cart.product_id', 'left');
        $this->db->join('inventory','inventory.product_id=product.product_id','left');
         $this->db->where('cart.user_id',$user_id);
+        $this->db->where('cart.status','1');
         $this->db->where('product.status','1');
         $this->db->where('inventory.status','1');
         $this->db->order_by('cart.cart_id','DESC'); 
