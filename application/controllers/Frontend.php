@@ -177,7 +177,7 @@ class Frontend extends REST_Controller {
                                     'terms_conditn_id' => $terms_cond != '' ? $termsCondtnId : 0,
                                     'app_version' => $app_version,
                                     'app_build_no' => $app_build_no,
-                                    'otp'=>$otp
+                                    'otp'=>54321
                                 );
                                 $inserted_id = $this->model->insertData('op_user',$curl_data);
 
@@ -545,23 +545,37 @@ class Frontend extends REST_Controller {
                       }
                       $product_details['img_url']= implode(',',$img_url1);
 
-                 $related_product_details = $this->superadmin_model->related_product_details_on_id($product_id);
-                 foreach ($related_product_details as $related_product_details_key => $related_product_details_row) {
-                     $related_product_details[$related_product_details_key]['image_name'] = APPURL.$related_product_details_row['image_name'];
+                      $related_product_details = $this->superadmin_model->related_product_details_on_id($product_id);
+                        foreach ($related_product_details as $related_product_details_key => $related_product_details_row) {
+                       $related_product_details[$related_product_details_key]['image_name'] = APPURL.$related_product_details_row['image_name'];
 
-                    $related_product_img_url = explode(',',$related_product_details_row['img_url']);
-                    foreach ($related_product_img_url as $related_product_img_url_key => $related_product_img_url_row) {
+                      $related_product_img_url = explode(',',$related_product_details_row['img_url']);
+                        foreach ($related_product_img_url as $related_product_img_url_key => $related_product_img_url_row) {
                             $related_product_img_url1[]= APPURL.$related_product_img_url_row;   
                             
-                      }
-                       $related_product_details[$related_product_details_key]['img_url']= implode(',',$related_product_img_url1);                     
-                 }
+                        }
+                        $related_product_details[$related_product_details_key]['img_url']= implode(',',$related_product_img_url1);                     
+                    }
+
+                    $cat_data = $this->superadmin_model->get_dynamic_cat($fk_lang_id);
+                    foreach ($cat_data as $cat_data_key => $val) {
+                        $sub_category_id = explode(",", $val['sub_category_id']);
+                        $sub_category_name = explode(",", $val['sub_category_name']);    
+                        $cat_data[$cat_data_key]['sub_category_id'] = $sub_category_id;
+                        $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
+                        foreach ($sub_category_id as $key1 => $val1) {
+                            $child_cat_name = $this->superadmin_model->get_dynamic_childcat($val1,$fk_lang_id);
+                            $custom_key_name = $sub_category_name[$key1] . '_' . $val1 ;
+                            $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
+                        }
+                    }
      
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
                     $response['product_details'] =$product_details;
                     $response['related_product_details'] =$related_product_details;
+                    $response['cat_data'] =$cat_data;
                    if(!empty($user_id)){
                         $response['cart_count'] = get_user_cart_count($user_id);
                         $response['wishlist_count'] = get_user_wishlist_count($user_id);
@@ -574,6 +588,8 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response); 
     }
+
+    // Product Search on name API
 
     public function get_product_on_search_post()
     {
@@ -602,7 +618,7 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);  
     }
-
+    // Get Dynamic Menu API
      public function get_dynamic_menu_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
@@ -644,6 +660,7 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
+    // Send OTP API
     public function send_otp_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
@@ -673,7 +690,7 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
-
+// Verify OTP API
     public function verify_otp_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
@@ -759,7 +776,7 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
-
+// User Profile API
     public function get_user_profile_data_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
@@ -1162,5 +1179,69 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
+
+    public function get_product_on_category_post()
+    {
+       $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+              $fk_lang_id = $this->input->post('fk_lang_id'); 
+              $category_id = $this->input->post('category_id'); 
+
+             if (empty($fk_lang_id)) {
+                $response['message'] = 'Language Id is required.';
+                $response['code'] = 201;
+            } else  if (empty($category_id)) {
+                $response['message'] = 'Category Id is required.';
+                $response['code'] = 201;
+            } else {
+                $product_data = $this->model->selectWhereData('product',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id),array('*'),false);
+                foreach ($product_data as $product_data_key => $product_data_row) {
+                   $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                }
+                $sub_category_data = $this->model->selectWhereData('subcategory',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id),array('*'),false);
+
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
+                $response['product_data'] =$product_data;
+                $response['sub_category_data'] =$sub_category_data;
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+    // public function get_sub_category_on_category_id_post()
+    // {
+    //    $response = array('code' => - 1, 'status' => false, 'message' => '');
+    //     $validate = validateToken();
+    //     if($validate){
+    //           $fk_lang_id = $this->input->post('fk_lang_id'); 
+    //           $category_id = $this->input->post('category_id'); 
+
+    //          if (empty($fk_lang_id)) {
+    //             $response['message'] = 'Language Id is required.';
+    //             $response['code'] = 201;
+    //         } else  if (empty($category_id)) {
+    //             $response['message'] = 'Category Id is required.';
+    //             $response['code'] = 201;
+    //         } else {
+    //             $product_data = $this->model->selectWhereData('product',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id,array('*'),false);
+    //             foreach ($product_data as $product_data_key => $product_data_row) {
+    //                $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+    //             }
+    //             $response['code'] = REST_Controller::HTTP_OK;
+    //             $response['status'] = true;  
+    //             $response['message'] = 'success';
+    //             $response['product_data'] =$product_data;
+    //         }       
+    //     } else {
+    //         $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+    //         $response['message'] = 'Unauthorised';
+    //     }
+    //     echo json_encode($response);
+    // }
 
 }
