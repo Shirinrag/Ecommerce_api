@@ -576,10 +576,10 @@ class Frontend extends REST_Controller {
                     $response['product_details'] =$product_details;
                     $response['related_product_details'] =$related_product_details;
                     $response['cat_data'] =$cat_data;
-                   if(!empty($user_id)){
-                        $response['cart_count'] = get_user_cart_count($user_id);
-                        $response['wishlist_count'] = get_user_wishlist_count($user_id);
-                  }
+                       if(!empty($user_id)){
+                            $response['cart_count'] = get_user_cart_count($user_id);
+                            $response['wishlist_count'] = get_user_wishlist_count($user_id);
+                      }
 
             }           
         } else {
@@ -1201,6 +1201,7 @@ class Frontend extends REST_Controller {
                 }
                 $sub_category_data = $this->model->selectWhereData('subcategory',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id),array('*'),false);
 
+
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
                 $response['message'] = 'success';
@@ -1213,35 +1214,5 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
-    // public function get_sub_category_on_category_id_post()
-    // {
-    //    $response = array('code' => - 1, 'status' => false, 'message' => '');
-    //     $validate = validateToken();
-    //     if($validate){
-    //           $fk_lang_id = $this->input->post('fk_lang_id'); 
-    //           $category_id = $this->input->post('category_id'); 
-
-    //          if (empty($fk_lang_id)) {
-    //             $response['message'] = 'Language Id is required.';
-    //             $response['code'] = 201;
-    //         } else  if (empty($category_id)) {
-    //             $response['message'] = 'Category Id is required.';
-    //             $response['code'] = 201;
-    //         } else {
-    //             $product_data = $this->model->selectWhereData('product',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id,array('*'),false);
-    //             foreach ($product_data as $product_data_key => $product_data_row) {
-    //                $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
-    //             }
-    //             $response['code'] = REST_Controller::HTTP_OK;
-    //             $response['status'] = true;  
-    //             $response['message'] = 'success';
-    //             $response['product_data'] =$product_data;
-    //         }       
-    //     } else {
-    //         $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
-    //         $response['message'] = 'Unauthorised';
-    //     }
-    //     echo json_encode($response);
-    // }
 
 }
