@@ -120,7 +120,7 @@ class Frontend extends REST_Controller {
                          }
                       }
                   }
-                  $category = $this->model->selectWhereData('category', array('status'=>1,),array('*'),false);
+                  $category = $this->model->selectWhereData('category', array('status'=>1,'fk_lang_id'=>$fk_lang_id),array('*'),false);
                   foreach ($category as $category_key => $category_row) {
                     $category[$category_key]['image_path'] = APPURL.$category_row['image_path'];
                         if($fk_lang_id==1){
@@ -565,13 +565,9 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             }else{
                 $this->load->model('superadmin_model');
-                 $product_details = $this->superadmin_model->product_details_on_id($product_id);               
+                 $product_details = $this->superadmin_model->product_details_on_id($product_id,$fk_lang_id);               
                     $product_details['image_name'] = APPURL.$product_details['image_name'];
-                    if($fk_lang_id==1){
-                            $product_details['product_name'] = $product_details['product_name'];
-                         }else{
-                            $product_details['product_name'] = $product_details['product_name_ar'];
-                         }
+
                     $img_url = explode(',',$product_details['img_url']);
                     foreach ($img_url as $img_url_key => $img_url_row) {
                             $img_url1[] = APPURL.$img_url_row;   
@@ -583,9 +579,9 @@ class Frontend extends REST_Controller {
                        $related_product_details[$related_product_details_key]['image_name'] = APPURL.$related_product_details_row['image_name'];
 
                          if($fk_lang_id==1){
-                            $related_product_details[$related_product_details_key]['product_name'] = $related_product_details_row['product_name'];
+                            $related_product_details[$related_product_details_key]['product_name'] = $category_row['product_name'];
                          }else{
-                            $related_product_details[$related_product_details_key]['product_name'] = $related_product_details_row['product_name_ar'];
+                            $related_product_details[$related_product_details_key]['product_name'] = $category_row['product_name_ar'];
                          }
 
                       $related_product_img_url = explode(',',$related_product_details_row['img_url']);
@@ -692,41 +688,15 @@ class Frontend extends REST_Controller {
                     $this->load->model('superadmin_model');
                     $cat_data = $this->superadmin_model->get_dynamic_cat($fk_lang_id);
                     foreach ($cat_data as $cat_data_key => $val) {
-                         if($fk_lang_id==1){
-                            $cat_data[$cat_data_key]['category_name'] = $val['category_name'];
-                         }else{
-                            $cat_data[$cat_data_key]['category_name'] = $val['category_name_ar'];
-                         }
                         $sub_category_id = explode(",", $val['sub_category_id']);
                         $sub_category_name = explode(",", $val['sub_category_name']);    
-                        $sub_category_name_ar = explode(",", $val['sub_category_name_ar']);    
                         $cat_data[$cat_data_key]['sub_category_id'] = $sub_category_id;
-                         if($fk_lang_id==1){
-                                $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
-                         }else{
-                                $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name_ar;
-                         }
-                        // $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
-
+                        $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
                         foreach ($sub_category_id as $key1 => $val1) {
                             $child_cat_name = $this->superadmin_model->get_dynamic_childcat($val1,$fk_lang_id);
-                                foreach ($child_cat_name as $child_cat_name_key => $child_cat_name_row) {
-                                    if($fk_lang_id==1){
-                                        $child_cat_name[$child_cat_name_key]['child_category_name'] = $child_cat_name_row['child_category_name'];
-                                    }else{
-                                          $child_cat_name[$child_cat_name_key]['child_category_name'] = $child_cat_name_row['child_category_name_ar'];
-                                    }
-                                }
-                              if($fk_lang_id==1){
-                                    $custom_key_name = $sub_category_name[$key1] . '_' . $val1 ;
-                                    $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
-                              }else{
-                                 $custom_key_name = $sub_category_name_ar[$key1] . '_' . $val1 ;
-                                    $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
-                              }
+                            $custom_key_name = $sub_category_name[$key1] . '_' . $val1 ;
+                            $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
                         }
-
-
                     }
 
 

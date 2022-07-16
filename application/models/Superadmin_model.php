@@ -20,13 +20,14 @@ class Superadmin_model extends CI_Model {
     }
 
     public function get_dynamic_cat($fk_lang_id=""){
-            $this->db->select('category.category_id,category.category_name,
+            $this->db->select('category.category_id,category.category_name,category.category_name_ar,
             GROUP_CONCAT(subcategory.sub_category_name) as sub_category_name,
+            GROUP_CONCAT(subcategory.sub_category_name_ar) as sub_category_name_ar,
             GROUP_CONCAT(subcategory.sub_category_id) as sub_category_id');
             $this->db->from('category');
             $this->db->join('subcategory','subcategory.category_id=category.category_id','left');
             $this->db->where('category.status',1);
-            $this->db->where('category.fk_lang_id',$fk_lang_id);
+            // $this->db->where('category.fk_lang_id',$fk_lang_id);
             $this->db->group_by('category.category_id');         
        
             $query = $this->db->get();
@@ -35,10 +36,10 @@ class Superadmin_model extends CI_Model {
     }
 
      public function get_dynamic_childcat($id="",$fk_lang_id=""){
-        $this->db->select('child_category_name,child_category_id');
+        $this->db->select('child_category_name,child_category_id,child_category_name_ar');
         $this->db->from('childcategory');     
         $this->db->where('childcategory.sub_category_id',$id);
-        $this->db->where('childcategory.fk_lang_id',$fk_lang_id);
+        // $this->db->where('childcategory.fk_lang_id',$fk_lang_id);
         
         $query = $this->db->get();
         $result = $query->result_array();
@@ -88,7 +89,7 @@ class Superadmin_model extends CI_Model {
        $this->db->from('cart');
        $this->db->join('product','cart.product_id=product.product_id','left');
        $this->db->where('cart.user_id',$user_id);
-       $this->db->where('product.fk_lang_id',$fk_lang_id);
+       // $this->db->where('product.fk_lang_id',$fk_lang_id);
         $this->db->where('cart.status','1');
        $query = $this->db->get();
         $result = $query->result_array();
@@ -111,7 +112,7 @@ class Superadmin_model extends CI_Model {
         return $result;
     }
 
-    public function product_details_on_id($product_id='',$fk_lang_id="")
+    public function product_details_on_id($product_id='')
     {
         $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
         $this->db->from('product');      
@@ -120,7 +121,7 @@ class Superadmin_model extends CI_Model {
         $this->db->join('subcategory','product.sub_category_id=subcategory.sub_category_id','left');
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
         $this->db->where('product.product_id',$product_id);
-        $this->db->where('product.fk_lang_id',$fk_lang_id);
+        // $this->db->where('product.fk_lang_id',$fk_lang_id);
         $this->db->where('product.status','1');
         $this->db->group_by('product_gallery.product_id');
         $query = $this->db->get();
@@ -139,7 +140,7 @@ class Superadmin_model extends CI_Model {
         $this->db->join('childcategory','childcategory.child_category_id=product.child_category_id','left');
 
         $this->db->where('product.product_id',$product_id);
-        $this->db->where('product.fk_lang_id',$fk_lang_id);
+        // $this->db->where('product.fk_lang_id',$fk_lang_id);
         $this->db->where('product.status','1');
         $this->db->group_by('product.product_id');
         $query = $this->db->get();
@@ -165,7 +166,7 @@ class Superadmin_model extends CI_Model {
     {
         $this->db->select('product.product_id,product.product_name,product.product_price,product.image_name,');
         $this->db->from('product');
-        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        // $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $query = $this->db->get();
         $result = $query->result_array();
         return $result;
@@ -175,7 +176,7 @@ class Superadmin_model extends CI_Model {
     {
         $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->where('product.fk_lang_id',$fk_lang_id);        
+        // $this->db->where('product.fk_lang_id',$fk_lang_id);        
         $this->db->where('product.status','1');
         $query = $this->db->get();
         $result = $query->result_array();
@@ -185,7 +186,7 @@ class Superadmin_model extends CI_Model {
     {
         $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        // $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $this->db->where('product.popular','1'); 
          $this->db->where('product.status','1');
         $query = $this->db->get();
@@ -196,7 +197,7 @@ class Superadmin_model extends CI_Model {
     {
         $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        // $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $this->db->where('product.featured','1');  
          $this->db->where('product.status','1');
         $query = $this->db->get();
@@ -207,7 +208,7 @@ class Superadmin_model extends CI_Model {
     {
         $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->where('product.fk_lang_id',$fk_lang_id);  
+        // $this->db->where('product.fk_lang_id',$fk_lang_id);  
         $this->db->where('product.best_selling',1);  
          $this->db->where('product.status','1');
     
