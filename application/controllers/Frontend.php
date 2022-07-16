@@ -661,9 +661,9 @@ class Frontend extends REST_Controller {
                 $this->load->model('superadmin_model');
                 $product_details = $this->superadmin_model->get_product_on_search($search_keyword);
                         if($fk_lang_id==1){
-                            $product_details['product_name'] = $val['product_name'];
+                            $product_details['product_name'] = $product_details['product_name'];
                          }else{
-                            $product_details['product_name'] = $val['product_name_ar'];
+                            $product_details['product_name'] = $product_details['product_name_ar'];
                          }
 
                     $response['code'] = REST_Controller::HTTP_OK;
