@@ -357,9 +357,6 @@ class Frontend extends REST_Controller {
             }else if(empty($building)){
                 $response['message']= "Building is required";
                 $response['code']= 201;
-            }else if(empty($street)){
-                $response['message']= "Street is required";
-                $response['code']= 201;
             }else if(empty($zone)){
                 $response['message']= "Zone is required";
                 $response['code']= 201;
@@ -660,11 +657,14 @@ class Frontend extends REST_Controller {
             }else{
                 $this->load->model('superadmin_model');
                 $product_details = $this->superadmin_model->get_product_on_search($search_keyword);
-                        if($fk_lang_id==1){
-                            $product_details['product_name'] = $product_details['product_name'];
+                foreach ($product_details as $product_details_key => $product_details_row) {
+                   if($fk_lang_id==1){
+                            $product_details[$product_details_key]['product_name'] = $product_details_row['product_name'];
                          }else{
-                            $product_details['product_name'] = $product_details['product_name_ar'];
+                            $product_details[$product_details_key]['product_name'] = $product_details_row['product_name_ar'];
                          }
+                }
+                        
 
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
