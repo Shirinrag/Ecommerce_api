@@ -8,7 +8,7 @@ class Superadmin_model extends CI_Model {
     
     public function get_product_on_search($search="",$fk_lang_id="")
     {
-        $this->db->select('product.*');
+        $this->db->select('product.product_name,product.product_id');
         $this->db->from('product');
         $this->db->or_like('product.product_name',$search);    
         // $this->db->or_like('product.productdesc_en',$search);
