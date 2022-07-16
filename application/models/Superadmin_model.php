@@ -15,7 +15,7 @@ class Superadmin_model extends CI_Model {
         // $this->db->or_like('product.productdesc_en',$search);
       
          $query = $this->db->get();
-            $result = $query->row_array();
+            $result = $query->result_array();
             return $result;
     }
 
