@@ -8,9 +8,8 @@ class Superadmin_model extends CI_Model {
     
     public function get_product_on_search($search="",$fk_lang_id="")
     {
-        $this->db->select('product.*,product_gallery.img_url');
+        $this->db->select('product.*');
         $this->db->from('product');
-        $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
         $this->db->or_like('product.product_name',$search);    
         // $this->db->or_like('product.productdesc_en',$search);
       
