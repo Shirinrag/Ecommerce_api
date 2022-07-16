@@ -1299,5 +1299,65 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
+    public function get_product_on_sub_category_post()
+    {
+       $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+              $fk_lang_id = $this->input->post('fk_lang_id'); 
+              $sub_category_id = $this->input->post('sub_category_id'); 
+
+             if (empty($fk_lang_id)) {
+                $response['message'] = 'Language Id is required.';
+                $response['code'] = 201;
+            } else  if (empty($sub_category_id)) {
+                $response['message'] = 'Sub Category Id is required.';
+                $response['code'] = 201;
+            } else {
+                $product_data = $this->model->selectWhereData('product',array('fk_lang_id'=>$fk_lang_id,'sub_category_id'=>$sub_category_id),array('*'),false);
+                foreach ($product_data as $product_data_key => $product_data_row) {
+                   $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                }
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
+                $response['product_data'] =$product_data;
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+    public function get_product_on_child_category_post()
+    {
+       $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+              $fk_lang_id = $this->input->post('fk_lang_id'); 
+              $child_category_id = $this->input->post('child_category_id'); 
+
+             if (empty($fk_lang_id)) {
+                $response['message'] = 'Language Id is required.';
+                $response['code'] = 201;
+            } else  if (empty($child_category_id)) {
+                $response['message'] = 'Sub Category Id is required.';
+                $response['code'] = 201;
+            } else {
+                $product_data = $this->model->selectWhereData('product',array('fk_lang_id'=>$fk_lang_id,'child_category_id'=>$child_category_id),array('*'),false);
+                foreach ($product_data as $product_data_key => $product_data_row) {
+                   $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                }
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
+                $response['product_data'] =$product_data;
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
 
 }
