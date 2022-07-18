@@ -96,7 +96,7 @@ class Superadmin_model extends CI_Model {
     }
 
     public function get_order_summary_info($user_id=''){
-        $this->db->select('cart.cart_id,cart.product_id as cart_product_id,cart.qty,
+        $this->db->select('cart.cart_id,cart.product_id as cart_product_id,cart.qty as cart_qty,
         product.*');
         $this->db->from('cart');      
         $this->db->join('product','product.product_id=cart.product_id', 'left');
