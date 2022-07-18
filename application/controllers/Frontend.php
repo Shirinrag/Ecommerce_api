@@ -1238,20 +1238,27 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             } else {
                 $this->load->model('superadmin_model');
-                $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
-                foreach ($cart_data as $cart_data_key => $cart_data_row) {
-                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['qty'];
-                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
-                        $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
-                }
                 
+               $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
+                $total = 0;
+                foreach ($cart_data as $cart_data_key => $cart_data_row) {
+                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['cart_qty'];
+                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['cart_qty'];
+                        $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
+                        $sub_total= $cart_data[$cart_data_key]['cartPrice'];
+                        $total = $total + $sub_total;
+                       
+                }
+                              
                 $user_address = $this->model->selectWhereData('user_delivery_address',array('user_id'=>$user_id,'status'=>'1'),array('*'),false);
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
                 $response['message'] = 'success';
                 $response['cart_product_details'] =$cart_data;
+                  $response['total'] = custom_number_format($total,2);
                 $response['user_address'] =$user_address;
-            }       
+            }
+              
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
             $response['message'] = 'Unauthorised';
@@ -1353,5 +1360,4 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
-
 }
