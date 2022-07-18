@@ -647,32 +647,24 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if($validate){ 
             $search_keyword = $this->input->post('search_keyword');
+            // echo '<pre>'; print_r($search_keyword); exit;
             $fk_lang_id = $this->input->post('fk_lang_id');
             if(empty($search_keyword)){
                 $response['message'] = 'Search is required.';
                 $response['code'] = 201;
-            }else if(empty($fk_lang_id)){
-                $response['message'] = 'Language is required.';
-                $response['code'] = 201;
             }else{
                 $this->load->model('superadmin_model');
-                // $product_details = $this->superadmin_model->get_product_on_search($search_keyword);
-                // foreach ($product_details as $product_details_key => $product_details_row) {
-                //    if($fk_lang_id==1){
-                //             $product_details[$product_details_key]['product_name'] = $product_details_row['product_name'];
-                //          }else{
-                //             $product_details[$product_details_key]['product_name'] = $product_details_row['product_name_ar'];
-                //          }
-                // }
-
-                $prosuct_name = $this->db->query("SELECT DISTINCT product_name as product_name FROM product WHERE product_name LIKE '%$search_keyword%' ESCAPE '!' LIMIT 30");
-                $response['product_name'] = $prosuct_name->result_array();
+                $this->db->where("product_name like '%".$search_keyword."%' ");
+                $records = $this->db->get('product')->result_array();
+                foreach($records as $row ){
+                     $data[] = array("product_name"=>$row['product_name']);
+                }
                         
 
-                    $response['code'] = REST_Controller::HTTP_OK;
-                    $response['status'] = true;
-                    $response['message'] = 'success';
-                    // $response['product_details'] =$product_details;
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;
+                $response['message'] = 'success';
+                    $response['product_name'] =$data;
             }
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -1230,7 +1222,7 @@ class Frontend extends REST_Controller {
         echo json_encode($response);
     }
 
-    public function check_out_api()
+    public function check_out_api_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
@@ -1252,8 +1244,7 @@ class Frontend extends REST_Controller {
                         $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['qty'];
                         $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
                 }
-
-
+                
                 $user_address = $this->model->selectWhereData('user_delivery_address',array('user_id'=>$user_id,'status'=>'1'),array('*'),false);
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
