@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 // error_reporting(0);
+ini_set("memory_limit", "-1");
 class Superadmin_model extends CI_Model {
 	 function __construct() {
         parent::__construct();

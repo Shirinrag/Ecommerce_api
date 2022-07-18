@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 // 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
+ini_set("memory_limit", "-1");
 require APPPATH . '/libraries/REST_Controller.php';
 
 class Frontend extends REST_Controller {
