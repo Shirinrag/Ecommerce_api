@@ -1040,7 +1040,7 @@ class Frontend extends REST_Controller {
                     $total = 0;
                     if(!empty($order_summary_info)){
                         foreach ($order_summary_info as $order_summary_info_key => $order_summary_info_row) {
-                            $subtotal = ($order_summary_info_row['qty']*$order_summary_info_row['product_price']);
+                            $subtotal = $order_summary_info_row['cart_qty']*$order_summary_info_row['product_offer_price'];
                            
                             $order_summary_info[$order_summary_info_key]['subtotal'] = custom_number_format($subtotal,2);
                           
