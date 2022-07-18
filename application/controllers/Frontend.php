@@ -656,20 +656,23 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             }else{
                 $this->load->model('superadmin_model');
-                $product_details = $this->superadmin_model->get_product_on_search($search_keyword);
-                foreach ($product_details as $product_details_key => $product_details_row) {
-                   if($fk_lang_id==1){
-                            $product_details[$product_details_key]['product_name'] = $product_details_row['product_name'];
-                         }else{
-                            $product_details[$product_details_key]['product_name'] = $product_details_row['product_name_ar'];
-                         }
-                }
+                // $product_details = $this->superadmin_model->get_product_on_search($search_keyword);
+                // foreach ($product_details as $product_details_key => $product_details_row) {
+                //    if($fk_lang_id==1){
+                //             $product_details[$product_details_key]['product_name'] = $product_details_row['product_name'];
+                //          }else{
+                //             $product_details[$product_details_key]['product_name'] = $product_details_row['product_name_ar'];
+                //          }
+                // }
+
+                $prosuct_name = $this->db->query("SELECT DISTINCT product_name as product_name FROM product WHERE product_name LIKE '%$search_keyword%' ESCAPE '!' LIMIT 30");
+                $response['product_name'] = $prosuct_name->result_array();
                         
 
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
-                    $response['product_details'] =$product_details;
+                    // $response['product_details'] =$product_details;
             }
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
