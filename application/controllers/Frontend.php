@@ -1370,7 +1370,7 @@ class Frontend extends REST_Controller {
               $user_id = $this->input->post('user_id'); 
               $fk_product_id = json_decode($this->input->post('fk_product_id'),true); 
               $order_id = json_decode($this->input->post('order_id')); 
-              $order_no = json_decode($this->input->post('order_no'); 
+              $order_no = $this->input->post('order_no'); 
               $fk_address_id = $this->input->post('fk_address_id'); 
               $quantity = json_decode($this->input->post('quantity'),true); 
               $unit_price = json_decode($this->input->post('unit_price'),true); 
