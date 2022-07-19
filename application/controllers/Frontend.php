@@ -1446,6 +1446,30 @@ class Frontend extends REST_Controller {
         echo json_encode($response);
     }
 
+    public function get_confirm_order_details_post()
+    {
+         $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+                $order_id = $this->input->post('order_id');
+
+                if(empty($order_id)){
+                    $response['message'] = "Order Id is required";
+                    $response['code'] = 201;
+                }else{
+                    $order_details = $this->model->selectWhereData('tbl_payment', array('order_id'=>$order_id),array('*'),false);
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['order_details'] = $order_details;
+                }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
     public function place_order_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
