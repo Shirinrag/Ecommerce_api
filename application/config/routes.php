@@ -88,3 +88,5 @@ $route['get-product-on-category']='Frontend/get_product_on_category';
 $route['get-product-on-sub-category']='Frontend/get_product_on_sub_category';
 $route['get-product-on-child-category']='Frontend/get_product_on_child_category';
 $route['check-out-api']='Frontend/check_out_api';
+$route['add-payment-data']='Frontend/add_payment_data';
+$route['order-place']='Frontend/order_place';

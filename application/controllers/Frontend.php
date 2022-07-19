@@ -1362,20 +1362,20 @@ class Frontend extends REST_Controller {
         echo json_encode($response);
     }
 
-    public function add_payment_data()
+    public function add_payment_data_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
         if($validate){
               $user_id = $this->input->post('user_id'); 
-              $fk_product_id = $this->input->post('fk_product_id'); 
-              $order_id = $this->input->post('order_id'); 
-              $order_no = $this->input->post('order_no'); 
+              $fk_product_id = json_decode($this->input->post('fk_product_id'),true); 
+              $order_id = json_decode($this->input->post('order_id')); 
+              $order_no = json_decode($this->input->post('order_no'); 
               $fk_address_id = $this->input->post('fk_address_id'); 
-              $quantity = $this->input->post('quantity'); 
-              $unit_price = $this->input->post('unit_price'); 
-              $sub_total = $this->input->post('sub_total'); 
-              $tax = $this->input->post('tax'); 
+              $quantity = json_decode($this->input->post('quantity'),true); 
+              $unit_price = json_decode($this->input->post('unit_price'),true); 
+              $sub_total = json_decode($this->input->post('sub_total'),true); 
+              $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
               $date = $this->input->post('date'); 
             
@@ -1407,18 +1407,94 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Date is required.';
                 $response['code'] = 201;
             } else {
-                $curl_data = array(
-                    'fk_user_id'=>$user_id,
-                    'order_id'=>$order_id,
-                    'order_no'=>mt_rand(100000,999999),
-                    'fk_address_id'=>$fk_address_id,
-                    'fk_user_id'=>$user_id,
-                    'fk_user_id'=>$user_id,
-                    'fk_user_id'=>$user_id,
-                    'fk_user_id'=>$user_id,
-                    'fk_user_id'=>$user_id,
-                    'fk_user_id'=>$user_id,
-                );
+                foreach ($quantity as $quantity_key => $quantity_row) {
+                    $curl_data = array(
+                        'fk_user_id'=>$user_id,
+                        'order_id'=>$order_id,
+                        'order_no'=>mt_rand(100000,999999),
+                        'fk_address_id'=>$fk_address_id,
+                        'quantity'=>$quantity_row,
+                        'unit_price'=>$unit_price[$quantity_key],
+                        'sub_total'=>$sub_total[$quantity_key],
+                        'grand_total'=>$grand_total,
+                        'date'=>date('Y-m-d'),
+                    );
+                    $inserted_id = $this->model->insertData('tbl_payment',$curl_data);
+                }
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function place_order_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+              $user_id = $this->input->post('user_id'); 
+              $fk_product_id = json_decode($this->input->post('fk_product_id'),true); 
+              $order_no = $this->input->post('order_no'); 
+              $fk_address_id = $this->input->post('fk_address_id'); 
+              $quantity = json_decode($this->input->post('quantity'),true); 
+              $unit_price = json_decode($this->input->post('unit_price'),true); 
+              $sub_total = json_decode($this->input->post('sub_total'),true); 
+              $tax = json_decode($this->input->post('tax'),true); 
+              $grand_total = $this->input->post('grand_total'); 
+              $date = $this->input->post('date'); 
+            
+            if (empty($user_id)) {
+                $response['message'] = 'User Id is required.';
+                $response['code'] = 201;
+            } else if(empty($fk_product_id)) {
+                $response['message'] = 'Product Id is required.';
+                $response['code'] = 201;
+            }else if(empty($order_no)) {
+                $response['message'] = 'Order No is required.';
+                $response['code'] = 201;
+            }else if(empty($fk_address_id)) {
+                $response['message'] = 'Address id is required.';
+                $response['code'] = 201;
+            }else if(empty($quantity)) {
+                $response['message'] = 'Quantity is required.';
+                $response['code'] = 201;
+            }else if(empty($unit_price)) {
+                $response['message'] = 'Price is required.';
+                $response['code'] = 201;
+            }else if(empty($sub_total)) {
+                $response['message'] = 'Sub Total is required.';
+                $response['code'] = 201;
+            }else if(empty($grand_total)) {
+                $response['message'] = 'Grand Total is required.';
+                $response['code'] = 201;
+            }else if(empty($date)) {
+                $response['message'] = 'Date is required.';
+                $response['code'] = 201;
+            } else {
+                foreach ($quantity as $quantity_key => $quantity_row) {
+                    $curl_data = array(
+                        'fk_user_id'=>$user_id,
+                        'order_number'=>$order_no,
+                        'fk_address_id'=>$fk_address_id,
+                        'quantity'=>$quantity_row,
+                        'unit_price'=>$unit_price[$quantity_key],
+                        'sub_total'=>$sub_total[$quantity_key],
+                        'grand_total'=>$grand_total,
+                        'date'=>date('Y-m-d'),
+                    );
+                    $inserted_id = $this->model->insertData('order_data',$curl_data);
+
+                    $status_data = array(
+                        'fk_order_id'=>$inserted_id,
+                        'status'=>1,
+                    );
+                    $this->model->insertData('tbl_order_status',$status_data);
+                }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
                 $response['message'] = 'success';
