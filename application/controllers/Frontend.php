@@ -1374,6 +1374,7 @@ class Frontend extends REST_Controller {
               $fk_address_id = $this->input->post('fk_address_id'); 
               $quantity = json_decode($this->input->post('quantity'),true); 
               $unit_price = json_decode($this->input->post('unit_price'),true); 
+              $total = json_decode($this->input->post('total'),true); 
               $sub_total = json_decode($this->input->post('sub_total'),true); 
               $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
@@ -1397,6 +1398,9 @@ class Frontend extends REST_Controller {
             }else if(empty($unit_price)) {
                 $response['message'] = 'Price is required.';
                 $response['code'] = 201;
+            }else if(empty($total)) {
+                $response['message'] = 'Total is required.';
+                $response['code'] = 201;
             }else if(empty($sub_total)) {
                 $response['message'] = 'Sub Total is required.';
                 $response['code'] = 201;
@@ -1415,6 +1419,7 @@ class Frontend extends REST_Controller {
                         'fk_address_id'=>$fk_address_id,
                         'quantity'=>$quantity_row,
                         'unit_price'=>$unit_price[$quantity_key],
+                        'total'=>$total[$quantity_key],
                         'sub_total'=>$sub_total[$quantity_key],
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
