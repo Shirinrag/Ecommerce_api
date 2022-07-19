@@ -1386,7 +1386,7 @@ class Frontend extends REST_Controller {
               $quantity = json_decode($this->input->post('quantity'),true); 
               $unit_price = json_decode($this->input->post('unit_price'),true); 
               $total = json_decode($this->input->post('total'),true); 
-              $sub_total = json_decode($this->input->post('sub_total'),true); 
+              $sub_total = $this->input->post('sub_total'); 
               $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
                   
@@ -1428,7 +1428,7 @@ class Frontend extends REST_Controller {
                         'quantity'=>$quantity_row,
                         'unit_price'=>$unit_price[$quantity_key],
                         'total'=>$total[$quantity_key],
-                        'sub_total'=>$sub_total[$quantity_key],
+                        'sub_total'=>$sub_total,
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
                     );
