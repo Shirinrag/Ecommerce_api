@@ -104,7 +104,7 @@
                     <div class="company-details">
                         <p class="text-white">assdad asd  asda asdad a sd</p>
                         <p class="text-white">assdad asd asd</p>
-                        <p class="text-white">+91 888555XXXX</p>
+                        <p class="text-white"></p>
                     </div>
                 </div>
             </div>
