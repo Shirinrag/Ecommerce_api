@@ -1369,7 +1369,7 @@ class Frontend extends REST_Controller {
         if($validate){
               $user_id = $this->input->post('user_id'); 
               $fk_product_id = json_decode($this->input->post('fk_product_id'),true); 
-              $order_id = json_decode($this->input->post('order_id')); 
+              $order_id = $this->input->post('order_id'); 
               $order_no = $this->input->post('order_no'); 
               $fk_address_id = $this->input->post('fk_address_id'); 
               $quantity = json_decode($this->input->post('quantity'),true); 
