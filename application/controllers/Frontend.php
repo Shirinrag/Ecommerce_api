@@ -1382,7 +1382,7 @@ class Frontend extends REST_Controller {
               $user_id = $this->input->post('user_id'); 
               $fk_product_id = json_decode($this->input->post('fk_product_id'),true); 
               $order_id = $this->input->post('order_id'); 
-              $order_no = $this->input->post('order_no'); 
+              $order_no = mt_rand(100000,999999); 
               $fk_address_id = $this->input->post('fk_address_id'); 
               $quantity = json_decode($this->input->post('quantity'),true); 
               $unit_price = json_decode($this->input->post('unit_price'),true); 
@@ -1423,7 +1423,7 @@ class Frontend extends REST_Controller {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
                         'order_id'=>$order_id,
-                        'order_no'=>mt_rand(100000,999999),
+                        'order_no'=>$order_no,
                         'fk_address_id'=>$fk_address_id,
                         'fk_product_id'=>$fk_product_id[$quantity_key],
                         'quantity'=>$quantity_row,
@@ -1457,11 +1457,11 @@ class Frontend extends REST_Controller {
               $fk_address_id = $this->input->post('fk_address_id'); 
               $quantity = json_decode($this->input->post('quantity'),true); 
               $unit_price = json_decode($this->input->post('unit_price'),true); 
-              $sub_total = json_decode($this->input->post('sub_total'),true); 
+              $total = json_decode($this->input->post('total'),true); 
+              $sub_total = $this->input->post('sub_total'); 
               $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
-              $date = $this->input->post('date'); 
-            
+                      
             if (empty($user_id)) {
                 $response['message'] = 'User Id is required.';
                 $response['code'] = 201;
@@ -1486,19 +1486,17 @@ class Frontend extends REST_Controller {
             }else if(empty($grand_total)) {
                 $response['message'] = 'Grand Total is required.';
                 $response['code'] = 201;
-            }else if(empty($date)) {
-                $response['message'] = 'Date is required.';
-                $response['code'] = 201;
-            } else {
-                foreach ($quantity as $quantity_key => $quantity_row) {
+            }else {
+                foreach ($fk_product_id as $fk_product_id_key => $fk_product_id_row) {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
-                        'fk_user_id'=>$user_id,
+                        'fk_product_id'=>$fk_product_id_row,
                         'order_number'=>$order_no,
                         'fk_address_id'=>$fk_address_id,
-                        'quantity'=>$quantity_row,
-                        'unit_price'=>$unit_price[$quantity_key],
-                        'sub_total'=>$sub_total[$quantity_key],
+                        'quantity'=>$quantity[$fk_product_id_key],
+                        'unit_price'=>$unit_price[$fk_product_id_key],
+                        'total'=>$total[$fk_product_id_key],
+                        'sub_total'=>$sub_total[$fk_product_id_key],
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
                     );
@@ -1509,6 +1507,10 @@ class Frontend extends REST_Controller {
                         'status'=>1,
                     );
                     $this->model->insertData('tbl_order_status',$status_data);
+
+                     $this->db->where('fk_user_id', $fk_user_id);
+                     $this->db->where('fk_product_id', $fk_product_id_row);
+                     $this->db->delete('cart');
 
 
                 }
@@ -1522,4 +1524,6 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
+
+   
 }
