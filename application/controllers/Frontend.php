@@ -1256,7 +1256,7 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'success';
                 $response['cart_product_details'] =$cart_data;
-                  $response['total'] = custom_number_format($total,2);
+                $response['total'] = custom_number_format($total,2);
                 $response['user_address'] =$user_address;
             }
               
@@ -1333,7 +1333,7 @@ class Frontend extends REST_Controller {
     }
     public function get_product_on_child_category_post()
     {
-       $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
         if($validate){
               $fk_lang_id = $this->input->post('fk_lang_id'); 
@@ -1354,6 +1354,74 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'success';
                 $response['product_data'] =$product_data;
+            }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function add_payment_data()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+              $user_id = $this->input->post('user_id'); 
+              $fk_product_id = $this->input->post('fk_product_id'); 
+              $order_id = $this->input->post('order_id'); 
+              $order_no = $this->input->post('order_no'); 
+              $fk_address_id = $this->input->post('fk_address_id'); 
+              $quantity = $this->input->post('quantity'); 
+              $unit_price = $this->input->post('unit_price'); 
+              $sub_total = $this->input->post('sub_total'); 
+              $tax = $this->input->post('tax'); 
+              $grand_total = $this->input->post('grand_total'); 
+              $date = $this->input->post('date'); 
+            
+            if (empty($user_id)) {
+                $response['message'] = 'User Id is required.';
+                $response['code'] = 201;
+            } else if(empty($fk_product_id)) {
+                $response['message'] = 'Product Id is required.';
+                $response['code'] = 201;
+            }else if(empty($order_id)) {
+                $response['message'] = 'Order id is required.';
+                $response['code'] = 201;
+            }else if(empty($fk_address_id)) {
+                $response['message'] = 'Address id is required.';
+                $response['code'] = 201;
+            }else if(empty($quantity)) {
+                $response['message'] = 'Quantity is required.';
+                $response['code'] = 201;
+            }else if(empty($unit_price)) {
+                $response['message'] = 'Price is required.';
+                $response['code'] = 201;
+            }else if(empty($sub_total)) {
+                $response['message'] = 'Sub Total is required.';
+                $response['code'] = 201;
+            }else if(empty($grand_total)) {
+                $response['message'] = 'Grand Total is required.';
+                $response['code'] = 201;
+            }else if(empty($date)) {
+                $response['message'] = 'Date is required.';
+                $response['code'] = 201;
+            } else {
+                $curl_data = array(
+                    'fk_user_id'=>$user_id,
+                    'order_id'=>$order_id,
+                    'order_no'=>mt_rand(100000,999999),
+                    'fk_address_id'=>$fk_address_id,
+                    'fk_user_id'=>$user_id,
+                    'fk_user_id'=>$user_id,
+                    'fk_user_id'=>$user_id,
+                    'fk_user_id'=>$user_id,
+                    'fk_user_id'=>$user_id,
+                    'fk_user_id'=>$user_id,
+                );
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;  
+                $response['message'] = 'success';
             }       
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
