@@ -1287,6 +1287,18 @@ class Frontend extends REST_Controller {
                 }
                 $sub_category_data = $this->model->selectWhereData('subcategory',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id),array('*'),false);
 
+                if(empty($product_data)){
+                    $product_data=[];
+                }else{
+                    $product_data = $product_data;
+                }
+
+                if(empty($sub_category_data)){
+                    $sub_category_data=[];
+                }else{
+                    $sub_category_data = $sub_category_data;
+                }
+
 
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
@@ -1377,8 +1389,7 @@ class Frontend extends REST_Controller {
               $sub_total = json_decode($this->input->post('sub_total'),true); 
               $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
-              $date = $this->input->post('date'); 
-            
+                  
             if (empty($user_id)) {
                 $response['message'] = 'User Id is required.';
                 $response['code'] = 201;
@@ -1406,16 +1417,14 @@ class Frontend extends REST_Controller {
             }else if(empty($grand_total)) {
                 $response['message'] = 'Grand Total is required.';
                 $response['code'] = 201;
-            }else if(empty($date)) {
-                $response['message'] = 'Date is required.';
-                $response['code'] = 201;
-            } else {
+            }else {
                 foreach ($quantity as $quantity_key => $quantity_row) {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
                         'order_id'=>$order_id,
                         'order_no'=>mt_rand(100000,999999),
                         'fk_address_id'=>$fk_address_id,
+                        'fk_product_id'=>$fk_product_id[$quantity_key],
                         'quantity'=>$quantity_row,
                         'unit_price'=>$unit_price[$quantity_key],
                         'total'=>$total[$quantity_key],
@@ -1483,6 +1492,7 @@ class Frontend extends REST_Controller {
                 foreach ($quantity as $quantity_key => $quantity_row) {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
+                        'fk_user_id'=>$user_id,
                         'order_number'=>$order_no,
                         'fk_address_id'=>$fk_address_id,
                         'quantity'=>$quantity_row,
@@ -1498,6 +1508,8 @@ class Frontend extends REST_Controller {
                         'status'=>1,
                     );
                     $this->model->insertData('tbl_order_status',$status_data);
+
+
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
