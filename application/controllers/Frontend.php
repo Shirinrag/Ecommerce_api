@@ -1378,7 +1378,6 @@ class Frontend extends REST_Controller {
               $sub_total = json_decode($this->input->post('sub_total'),true); 
               $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
-              $date = $this->input->post('date'); 
             
             if (empty($user_id)) {
                 $response['message'] = 'User Id is required.';
