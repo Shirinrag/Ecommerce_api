@@ -1478,8 +1478,7 @@ class Frontend extends REST_Controller {
                 foreach ($quantity as $quantity_key => $quantity_row) {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
-                        'order_id'=>$order_id,
-                        'order_no'=>$order_no,
+                        'order_number'=>$order_no,
                         'fk_address_id'=>$fk_address_id,
                         'quantity'=>$quantity_row,
                         'unit_price'=>$unit_price[$quantity_key],
@@ -1487,7 +1486,13 @@ class Frontend extends REST_Controller {
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
                     );
-                    $inserted_id = $this->model->insertData('tbl_payment',$curl_data);
+                    $inserted_id = $this->model->insertData('order_data',$curl_data);
+
+                    $status_data = array(
+                        'fk_order_id'=>$inserted_id,
+                        'status'=>1,
+                    );
+                    $this->model->insertData('tbl_order_status',$status_data);
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
