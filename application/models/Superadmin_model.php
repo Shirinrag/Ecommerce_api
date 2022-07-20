@@ -216,4 +216,15 @@ class Superadmin_model extends CI_Model {
         $result = $query->result_array();
         return $result;
     }
+
+    public function order_history($user_id='')
+    {
+        $this->db->select('order_data.id,order_data.order_number,order_data.quantity,order_data.grand_total,product.product_name,product.image_name');
+        $this->db->from('order_data');
+        $this->db->join('product','order_data.fk_product_id=product.product_id','left');
+        $this->db->where('order_data.fk_user_id',$user_id);     
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
 }

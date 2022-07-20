@@ -1027,18 +1027,33 @@ class Appapi extends CI_Controller
         
         ini_set('memory_limit', '256M');
                                 
-        $pdfFilePath = FCPATH . "uploads/invoice.pdf";
-        // echo '<pre>'; print_r($pdfFilePath); exit;
-        // $this->load->view('invoice');
-        $html = $this->load->view('invoice', array(), true);
-        $this->load->library('m_pdf');
-        $mpdf = new mPDF('utf-8');
-        $mpdf->SetDisplayMode('fullpage');
-        // $mpdf->AddPage('P', 'A4');
+        // $pdfFilePath = FCPATH . "uploads/invoice.pdf";
+        // // echo '<pre>'; print_r($pdfFilePath); exit;
+         // $this->load->view('invoice');
+        // $html = $this->load->view('invoice', array(), true);
+        // $this->load->library('m_pdf');
+        // $mpdf = new mPDF('utf-8');
+        // $mpdf->SetDisplayMode('fullpage');
+        // // $mpdf->AddPage('P', 'A4');
        
-        $mpdf->WriteHTML($html);
-        $mpdf->Output($pdfFilePath, "I");
-        $response['path'] = $pdfFilePaths;
-        
+        // $mpdf->WriteHTML($html);
+        // $mpdf->Output($pdfFilePath, "I");
+        // $response['path'] = $pdfFilePaths;
+          $data=[];
+                $pdfFilePath = "output_pdf_name.pdf";
+                $this->load->library('Pdf');
+                $tcpdf = new Pdf('P', 'mm', 'A4', true, 'UTF-8', false);
+                $tcpdf->AddPage('L');
+                 $tcpdf->SetHeaderMargin(10);
+        // Set Top Margin
+        $tcpdf->SetTopMargin(20);
+        // set Footer Margin
+        $tcpdf->setFooterMargin(20);
+           // $tcpdf->SetAutoPageBreak(false);
+                $html = $this->load->view('invoice', $data,true); 
+                 $tcpdf->SetDisplayMode('real', 'default');
+                $tcpdf->WriteHTML($html);
+                ob_end_clean();
+                $tcpdf->Output($pdfFilePath, "I");
     }
 }
