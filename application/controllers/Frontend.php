@@ -61,7 +61,7 @@ class Frontend extends REST_Controller {
                   $response['code'] = 201;
             }else{
                 $this->load->model('superadmin_model');
-                  $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('*'),false);
+                  $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
                   foreach ($slider as $slider_key => $slider_row) {
                     $slider[$slider_key]['img_url'] = APPURL.$slider_row['img_url'];
                   }
@@ -1519,7 +1519,7 @@ class Frontend extends REST_Controller {
                         'quantity'=>$quantity[$fk_product_id_key],
                         'unit_price'=>$unit_price[$fk_product_id_key],
                         'total'=>$total[$fk_product_id_key],
-                        'sub_total'=>$sub_total[$fk_product_id_key],
+                        'sub_total'=>$sub_total,
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
                     );
@@ -1536,14 +1536,14 @@ class Frontend extends REST_Controller {
                     if(!empty($last_total_quantity)){
 
                          $inventory_data = array('status' => "0",);
-                         $this->db->where('product_id', $product_id_row);
+                         $this->db->where('product_id', $fk_product_id_row);
                          $this->db->update('inventory', $inventory_data);
 
-                         $inventory_data = array('product_id' => $product_id_row, 'qty' => $last_total_quantity['qty'] - $quantity[$fk_product_id_key]);
-                        $this->api_model->comman_insert('inventory', $inventory_data);
+                         $inventory_data = array('product_id' => $fk_product_id_row, 'qty' => $last_total_quantity['qty'] - $quantity[$fk_product_id_key]);
+                         $this->model->insertData('inventory', $inventory_data);
                     }
-                     $this->db->where('fk_user_id', $fk_user_id);
-                     $this->db->where('fk_product_id', $fk_product_id_row);
+                     $this->db->where('user_id', $user_id);
+                     $this->db->where('product_id', $fk_product_id_row);
                      $this->db->delete('cart');
 
                 }
@@ -1551,54 +1551,6 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'success';
             }       
-        } else {
-            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
-            $response['message'] = 'Unauthorised';
-        }
-        echo json_encode($response);
-    }
-
-    public function order_history_post()
-    {
-        $response = array('code' => - 1, 'status' => false, 'message' => '');
-        $validate = validateToken();
-        if($validate){
-                $user_id = $this->input->post('user_id');
-
-                if(empty($user_id)){
-                    $response['message'] = "User Id is required";
-                    $response['code'] = 201;
-                }else{
-                    $this->load->model('superadmin_model');
-                    $order_history = $this->superadmin_model->order_history($user_id);
-                    $response['code'] = REST_Controller::HTTP_OK;
-                    $response['status'] = true;
-                    $response['message'] = 'success';
-                    $response['order_history'] = $order_history;
-                }
-        } else {
-            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
-            $response['message'] = 'Unauthorised';
-        }
-        echo json_encode($response);
-    }
-    public function order_history_on_order_id_post()
-    {
-        $response = array('code' => - 1, 'status' => false, 'message' => '');
-        $validate = validateToken();
-        if($validate){
-                $id = $this->input->post('id');
-                if(empty($id)){
-                    $response['message'] = "Id is required";
-                    $response['code'] = 201;
-                }else{
-                    $this->load->model('superadmin_model');
-                    $order_history = $this->superadmin_model->order_history($id);
-                    $response['code'] = REST_Controller::HTTP_OK;
-                    $response['status'] = true;
-                    $response['message'] = 'success';
-                    $response['order_history'] = $order_history;
-                }
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
             $response['message'] = 'Unauthorised';
