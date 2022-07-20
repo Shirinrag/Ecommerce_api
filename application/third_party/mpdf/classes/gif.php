@@ -1,4 +1,14 @@
 <?php
+
+defined('_JEXEC') or die;
+
+/**
+ * This file belongs to mPDF Joomla! library which was packaged by CMExtension.
+ * mPDF is PHP library for generating PDF.
+ * CMExtension only created this package for installing into Joomla! CMS.
+ * All credits for mPDF belong to Ian Back and the contributors.
+ */
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // 2009-12-22 Adapted for mPDF 4.2
 ///////////////////////////////////////////////////////////////////////////////////////////////////

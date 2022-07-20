@@ -1,4 +1,14 @@
 <?php
+
+defined('_JEXEC') or die;
+
+/**
+ * This file belongs to mPDF Joomla! library which was packaged by CMExtension.
+ * mPDF is PHP library for generating PDF.
+ * CMExtension only created this package for installing into Joomla! CMS.
+ * All credits for mPDF belong to Ian Back and the contributors.
+ */
+
 $cw=array(
 	chr(0)=>250,chr(1)=>250,chr(2)=>250,chr(3)=>250,chr(4)=>250,chr(5)=>250,chr(6)=>250,chr(7)=>250,chr(8)=>250,chr(9)=>250,chr(10)=>250,chr(11)=>250,chr(12)=>250,chr(13)=>250,chr(14)=>250,chr(15)=>250,chr(16)=>250,chr(17)=>250,chr(18)=>250,chr(19)=>250,chr(20)=>250,chr(21)=>250,
 	chr(22)=>250,chr(23)=>250,chr(24)=>250,chr(25)=>250,chr(26)=>250,chr(27)=>250,chr(28)=>250,chr(29)=>250,chr(30)=>250,chr(31)=>250,' '=>250,'!'=>333,'"'=>420,'#'=>500,'$'=>500,'%'=>833,'&'=>778,'\''=>214,'('=>333,')'=>333,'*'=>500,'+'=>675,
@@ -13,7 +23,8 @@ $cw=array(
 	chr(220)=>722,chr(221)=>556,chr(222)=>611,chr(223)=>500,chr(224)=>500,chr(225)=>500,chr(226)=>500,chr(227)=>500,chr(228)=>500,chr(229)=>500,chr(230)=>667,chr(231)=>444,chr(232)=>444,chr(233)=>444,chr(234)=>444,chr(235)=>444,chr(236)=>278,chr(237)=>278,chr(238)=>278,chr(239)=>278,chr(240)=>500,chr(241)=>500,
 	chr(242)=>500,chr(243)=>500,chr(244)=>500,chr(245)=>500,chr(246)=>500,chr(247)=>675,chr(248)=>500,chr(249)=>500,chr(250)=>500,chr(251)=>500,chr(252)=>500,chr(253)=>444,chr(254)=>500,chr(255)=>444);
 
-$desc=array('Ascent'=>683,'Descent'=>-217,'CapHeight'=>653,'FontBBox'=>'[-169 -217 1010 883]');
+//$desc=array('Ascent'=>683,'Descent'=>-217,'CapHeight'=>653,'FontBBox'=>'[-169 -217 1010 883]');
+$desc=array('Flags'=>96,'FontBBox'=>'[-169 -217 1010 883]','ItalicAngle'=>-15.5,'Ascent'=>883,'Descent'=>-217,'Leading'=>0,'CapHeight'=>653,'XHeight'=>441,'StemV'=>76,'StemH'=>32,'AvgWidth'=>491,'MaxWidth'=>1000,'MissingWidth'=>491);
 $up=-100;
 $ut=50;
 $kerninfo=array ( chr(49)=> array ( chr(49)=> -74, ), chr(65)=> array ( chr(84)=> -37, chr(86)=> -49, chr(87)=> -37, chr(89)=> -55, chr(118)=> -55, chr(119)=> -55, chr(121)=> -55, chr(146)=> -37, ), chr(70)=> array ( chr(44)=> -128, chr(46)=> -128, chr(65)=> -128, ), chr(76)=> array ( chr(84)=> -20, chr(86)=> -37, chr(87)=> -37, chr(89)=> -20, chr(121)=> -29, chr(146)=> -37, ), chr(80)=> array ( chr(44)=> -128, chr(46)=> -128, chr(65)=> -128, ), chr(82)=> array ( chr(84)=> 0, chr(86)=> -18, chr(87)=> -18, chr(89)=> -18, chr(121)=> -18, ), chr(84)=> array ( chr(44)=> -74, chr(46)=> -74, chr(58)=> -55, chr(65)=> -74, chr(79)=> -18, chr(97)=> -91, chr(99)=> -91, chr(101)=> -91, chr(105)=> -55, chr(111)=> -91, chr(114)=> -55, chr(115)=> -91, chr(117)=> -55, chr(119)=> -74, chr(121)=> -74, ), chr(86)=> array ( chr(44)=> -128, chr(46)=> -128, chr(58)=> -64, chr(65)=> -74, chr(79)=> -29, chr(97)=> -110, chr(101)=> -110, chr(105)=> -74, chr(111)=> -110, chr(114)=> -74, chr(117)=> -74, chr(121)=> -91, ), chr(87)=> array ( chr(44)=> -91, chr(46)=> -91, chr(58)=> -64, chr(65)=> -69, chr(97)=> -91, chr(101)=> -91, chr(105)=> -55, chr(111)=> -91, chr(114)=> -55, chr(117)=> -55, chr(121)=> -91, ), chr(89)=> array ( chr(44)=> -91, chr(46)=> -91, chr(58)=> -64, chr(65)=> -69, chr(97)=> -91, chr(101)=> -91, chr(105)=> -74, chr(111)=> -91, chr(112)=> -91, chr(113)=> -110, chr(117)=> -91, chr(118)=> -91, ), chr(102)=> array ( chr(146)=> 91, ), chr(114)=> array ( chr(44)=> -110, chr(46)=> -110, chr(99)=> -37, chr(100)=> -37, chr(101)=> -37, chr(103)=> -37, chr(104)=> -18, chr(111)=> -37, chr(113)=> -37, chr(114)=> 0, chr(116)=> 0, chr(117)=> 0, chr(118)=> 0, chr(119)=> 0, chr(120)=> 0, chr(121)=> 0, chr(146)=> 37, ), chr(118)=> array ( chr(44)=> -74, chr(46)=> -74, ), chr(119)=> array ( chr(44)=> -74, chr(46)=> -74, ), chr(121)=> array ( chr(44)=> -55, chr(46)=> -55, ), chr(145)=> array ( chr(145)=> -110, ), chr(146)=> array ( chr(115)=> -128, chr(116)=> -110, chr(146)=> -110, ), ); 

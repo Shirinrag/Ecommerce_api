@@ -1,4 +1,14 @@
 <?php
+
+defined('_JEXEC') or die;
+
+/**
+ * This file belongs to mPDF Joomla! library which was packaged by CMExtension.
+ * mPDF is PHP library for generating PDF.
+ * CMExtension only created this package for installing into Joomla! CMS.
+ * All credits for mPDF belong to Ian Back and the contributors.
+ */
+
 $cw=array(
 	chr(0)=>250,chr(1)=>250,chr(2)=>250,chr(3)=>250,chr(4)=>250,chr(5)=>250,chr(6)=>250,chr(7)=>250,chr(8)=>250,chr(9)=>250,chr(10)=>250,chr(11)=>250,chr(12)=>250,chr(13)=>250,chr(14)=>250,chr(15)=>250,chr(16)=>250,chr(17)=>250,chr(18)=>250,chr(19)=>250,chr(20)=>250,chr(21)=>250,
 	chr(22)=>250,chr(23)=>250,chr(24)=>250,chr(25)=>250,chr(26)=>250,chr(27)=>250,chr(28)=>250,chr(29)=>250,chr(30)=>250,chr(31)=>250,' '=>250,'!'=>333,'"'=>713,'#'=>500,'$'=>549,'%'=>833,'&'=>778,'\''=>439,'('=>333,')'=>333,'*'=>500,'+'=>549,
@@ -13,7 +23,8 @@ $cw=array(
 	chr(220)=>987,chr(221)=>603,chr(222)=>987,chr(223)=>603,chr(224)=>494,chr(225)=>329,chr(226)=>790,chr(227)=>790,chr(228)=>786,chr(229)=>713,chr(230)=>384,chr(231)=>384,chr(232)=>384,chr(233)=>384,chr(234)=>384,chr(235)=>384,chr(236)=>494,chr(237)=>494,chr(238)=>494,chr(239)=>494,chr(240)=>0,chr(241)=>329,
 	chr(242)=>274,chr(243)=>686,chr(244)=>686,chr(245)=>686,chr(246)=>384,chr(247)=>384,chr(248)=>384,chr(249)=>384,chr(250)=>384,chr(251)=>384,chr(252)=>494,chr(253)=>494,chr(254)=>494,chr(255)=>0);
 
-$desc=array('FontBBox'=>'[-180 -293 1090 1010]');
+//$desc=array('FontBBox'=>'[-180 -293 1090 1010]');
+$desc=array('Flags'=>4,'FontBBox'=>'[-180 -293 1090 1010]','ItalicAngle'=>0,'Ascent'=>1010,'Descent'=>-293,'Leading'=>0,'CapHeight'=>1010,'StemV'=>85,'StemH'=>92,'AvgWidth'=>587,'MaxWidth'=>1042,'MissingWidth'=>587);
 $up=-100;
 $ut=50;
 
