@@ -1015,14 +1015,14 @@ class Frontend extends REST_Controller {
                 $cart_data = $this->model->selectwhereData('cart',array('cart_id'=>$cart_id),array('*'));
                 // echo '<pre>'; print_r($cart_data); exit;
                 $inventory_quantity = $this->model->selectwhereData('inventory',array('product_id'=>$product_id,'status'=>'1'),array('qty'));
-                // echo '<pre>'; print_r($inventory_quantity); exit;
+                //echo '<pre>'; print_r($inventory_quantity); exit;
                 if($quantity > $inventory_quantity['qty']){
                      $response['code'] = 201;
                      $message = "Out of Stock";
                      $response['message'] = $message;
                 }else{
                     $previous_quantity = $cart_data['qty'];
-                    // echo '<pre>'; print_r($previous_quantity); exit;
+                     //echo '<pre>'; print_r($previous_quantity); exit;
                     if(!empty($cart_data) && !empty($quantity)){
                         $update_data = array(
                             'qty'=>$quantity,     
