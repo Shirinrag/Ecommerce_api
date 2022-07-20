@@ -32,29 +32,29 @@ require_once('tcpdf_include.php');
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 // set document information
-$pdf->setCreator(PDF_CREATOR);
-$pdf->setAuthor('Nicola Asuni');
-$pdf->setTitle('TCPDF Example 015');
-$pdf->setSubject('TCPDF Tutorial');
-$pdf->setKeywords('TCPDF, PDF, example, test, guide');
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('Nicola Asuni');
+$pdf->SetTitle('TCPDF Example 015');
+$pdf->SetSubject('TCPDF Tutorial');
+$pdf->SetKeywords('TCPDF, PDF, example, test, guide');
 
 // set default header data
-$pdf->setHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 015', PDF_HEADER_STRING);
+$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 015', PDF_HEADER_STRING);
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 
 // set default monospaced font
-$pdf->setDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
 // set margins
-$pdf->setMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-$pdf->setHeaderMargin(PDF_MARGIN_HEADER);
-$pdf->setFooterMargin(PDF_MARGIN_FOOTER);
+$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 
 // set auto page breaks
-$pdf->setAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
 // set image scale factor
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
@@ -70,7 +70,7 @@ if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
 // Bookmark($txt, $level=0, $y=-1, $page='', $style='', $color=array(0,0,0))
 
 // set font
-$pdf->setFont('times', 'B', 20);
+$pdf->SetFont('times', 'B', 20);
 
 // add a page
 $pdf->AddPage();
@@ -81,11 +81,11 @@ $pdf->Bookmark('Chapter 1', 0, 0, '', 'B', array(0,64,128));
 // print a line using Cell()
 $pdf->Cell(0, 10, 'Chapter 1', 0, 1, 'L');
 
-$pdf->setFont('times', 'I', 14);
+$pdf->SetFont('times', 'I', 14);
 $pdf->Write(0, 'You can set PDF Bookmarks using the Bookmark() method.
 You can set PDF Named Destinations using the setDestination() method.');
 
-$pdf->setFont('times', 'B', 20);
+$pdf->SetFont('times', 'B', 20);
 
 // add other pages and bookmarks
 
@@ -111,18 +111,18 @@ $pdf->setDestination('chapter2', 0, '');
 // add a bookmark that points to a named destination
 $pdf->Bookmark('Chapter 2', 0, 0, '', 'BI', array(128,0,0), -1, '#chapter2');
 $pdf->Cell(0, 10, 'Chapter 2', 0, 1, 'L');
-$pdf->setFont('times', 'I', 14);
+$pdf->SetFont('times', 'I', 14);
 $pdf->Write(0, 'Once saved, you can open this document at this page using the link: "example_015.pdf#chapter2".');
 
 $pdf->AddPage();
 $pdf->setDestination('chapter3', 0, '');
-$pdf->setFont('times', 'B', 20);
+$pdf->SetFont('times', 'B', 20);
 $pdf->Bookmark('Chapter 3', 0, 0, '', 'B', array(0,64,128));
 $pdf->Cell(0, 10, 'Chapter 3', 0, 1, 'L');
 
 $pdf->AddPage();
 $pdf->setDestination('chapter4', 0, '');
-$pdf->setFont('times', 'B', 20);
+$pdf->SetFont('times', 'B', 20);
 $pdf->Bookmark('Chapter 4', 0, 0, '', 'B', array(0,64,128));
 $pdf->Cell(0, 10, 'Chapter 4', 0, 1, 'L');
 
@@ -131,7 +131,7 @@ $pdf->Bookmark('Chapter 5', 0, 0, '', 'B', array(0,128,0));
 $pdf->Cell(0, 10, 'Chapter 5', 0, 1, 'L');
 $txt = 'Example of File Attachment.
 Double click on the icon to open the attached file.';
-$pdf->setFont('helvetica', '', 10);
+$pdf->SetFont('helvetica', '', 10);
 $pdf->Write(0, $txt, '', 0, 'L', true, 0, false, false, 0);
 
 // attach an external file TXT file

@@ -60,7 +60,7 @@ class Frontend extends REST_Controller {
                   $response['code'] = 201;
             }else{
                 $this->load->model('superadmin_model');
-                  $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('bottom_id','img_url'),false);
+                  $slider = $this->model->selectWhereData('top_banner', array('status'=>1),array('*'),false);
                   foreach ($slider as $slider_key => $slider_row) {
                     $slider[$slider_key]['img_url'] = APPURL.$slider_row['img_url'];
                   }
@@ -1550,6 +1550,54 @@ class Frontend extends REST_Controller {
                 $response['status'] = true;  
                 $response['message'] = 'success';
             }       
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+    public function order_history_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+                $user_id = $this->input->post('user_id');
+
+                if(empty($user_id)){
+                    $response['message'] = "User Id is required";
+                    $response['code'] = 201;
+                }else{
+                    $this->load->model('superadmin_model');
+                    $order_history = $this->superadmin_model->order_history($user_id);
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['order_history'] = $order_history;
+                }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+    public function order_history_on_order_id_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+                $id = $this->input->post('id');
+                if(empty($id)){
+                    $response['message'] = "Id is required";
+                    $response['code'] = 201;
+                }else{
+                    $this->load->model('superadmin_model');
+                    $order_history = $this->superadmin_model->order_history($id);
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['order_history'] = $order_history;
+                }
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
             $response['message'] = 'Unauthorised';

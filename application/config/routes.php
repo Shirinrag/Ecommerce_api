@@ -91,3 +91,5 @@ $route['check-out-api']='Frontend/check_out_api';
 $route['add-payment-data']='Frontend/add_payment_data';
 $route['get-confirm-order-details']='Frontend/get_confirm_order_details';
 $route['order-place']='Frontend/place_order';
+$route['order-history']='Frontend/order_history';
+$route['order-history-on-order-id']='Frontend/order_history_on_order_id';
