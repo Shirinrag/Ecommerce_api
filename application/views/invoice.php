@@ -24,7 +24,7 @@
             margin-left: auto;
         }
         .brand-section{
-           background-color: #0d1033;
+           background-color: #d98237;
            padding: 10px 40px;
         }
         .logo{
@@ -95,16 +95,16 @@
 <body>
 
     <div class="container">
-        <div class="brand-section">
+        <div class="body-section">
             <div class="row">
                 <div class="col-6">
-                    <h1 class="text-white">Circuit Store</h1>
+                    <h1 class="text-white"><img src="<?php echo base_url()."uploads/logo.png"?>" style="height: 100px; width: 70%;"></h1>
                 </div>
                 <div class="col-6">
                     <div class="company-details">
-                        <p class="text-white">assdad asd  asda asdad a sd</p>
-                        <p class="text-white">assdad asd asd</p>
-                        <p class="text-white"></p>
+                        <p class="sub-heading">assdad asd  asda asdad a sd</p>
+                        <p class="sub-heading">assdad asd asd</p>
+                        <p class="sub-heading"></p>
                     </div>
                 </div>
             </div>
@@ -114,15 +114,14 @@
             <div class="row">
                 <div class="col-6">
                     <h2 class="heading">Invoice No.: 001</h2>
-                    <!-- <p class="sub-heading">Tracking No. fabcart2025 </p> -->
-                    <p class="sub-heading">Order Date: 20-20-2021 </p>
-                    <p class="sub-heading">Email Address: customer@gfmail.com </p>
+                    <p class="sub-heading"><strong>Order Date:</strong> 20-20-2021 </p>
+                    <!-- <p class="sub-heading">Email Address: customer@gfmail.com </p> -->
                 </div>
                 <div class="col-6">
-                    <p class="sub-heading">Full Name:  </p>
-                    <p class="sub-heading">Address:  </p>
-                    <p class="sub-heading">Phone Number:  </p>
-                    <p class="sub-heading">City,State,Pincode:  </p>
+                    <p class="sub-heading"><strong>Full Name:  </strong></p>
+                    <p class="sub-heading"><strong>Phone Number:  </strong></p>
+                    <p class="sub-heading"><strong>Address:  </strong></p>                   
+                   <!--  <p class="sub-heading">City,State,Pincode:  </p> -->
                 </div>
             </div>
         </div>
@@ -133,29 +132,31 @@
             <table class="table-bordered">
                 <thead>
                     <tr>
+                        <th>Sr.No</th>
                         <th>Product</th>
                         <th class="w-20">Price</th>
                         <th class="w-20">Quantity</th>
-                        <th class="w-20">Grandtotal</th>
+                        <th class="w-20">Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td>1</td>
                         <td>Product Name</td>
                         <td>10</td>
                         <td>1</td>
                         <td>10</td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="text-right">Sub Total</td>
+                        <td colspan="4" class="text-right"><strong>Sub Total</strong></td>
                         <td> 10.XX</td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="text-right">Tax Total %1X</td>
+                        <td colspan="4" class="text-right"><strong>Tax Total </strong></td>
                         <td> 2</td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="text-right">Grand Total</td>
+                        <td colspan="4" class="text-right"><strong>Grand Total</strong></td>
                         <td> 12.XX</td>
                     </tr>
                 </tbody>
@@ -167,7 +168,7 @@
 
         <div class="body-section">
             <p>&copy; Copyright <?= date('Y')?> - Circuit Store. All rights reserved. 
-                <a href="https://stzsoft.in/dev/Frontend" class="float-right">https://stzsoft.in/dev/Frontend</a>
+               
             </p>
         </div>      
     </div>      
