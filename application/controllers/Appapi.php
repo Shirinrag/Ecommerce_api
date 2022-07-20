@@ -1023,6 +1023,21 @@ class Appapi extends CI_Controller
 
      public function invoice()
     {
-        $this->load->view('invoice');
+        error_reporting(0);
+        
+        ini_set('memory_limit', '256M');
+                                
+                                $pdfFilePath = FCPATH . "uploads/qr_code" . '.pdf';
+                                
+                                $html = $this->load->view('invoice', array(), true);
+                                $this->load->library('m_pdf');
+                                $mpdf = new mPDF('utf-8');
+                                $mpdf->SetDisplayMode('fullpage');
+                                // $mpdf->AddPage('P', 'A4');
+                               
+                                $mpdf->WriteHTML($html);
+                                $mpdf->Output($pdfFilePath, "I");
+                                $response['path'] = $pdfFilePaths;
+        
     }
 }

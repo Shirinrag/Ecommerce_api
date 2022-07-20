@@ -1381,7 +1381,6 @@ class Frontend extends REST_Controller {
               $user_id = $this->input->post('user_id'); 
               $fk_product_id = json_decode($this->input->post('fk_product_id'),true); 
               $order_id = $this->input->post('order_id'); 
-              $order_no = mt_rand(100000,999999); 
               $fk_address_id = $this->input->post('fk_address_id'); 
               $quantity = json_decode($this->input->post('quantity'),true); 
               $unit_price = json_decode($this->input->post('unit_price'),true); 
@@ -1422,7 +1421,7 @@ class Frontend extends REST_Controller {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
                         'order_id'=>$order_id,
-                        'order_no'=>$order_no,
+                        'order_no'=>mt_rand(100000,999999),
                         'fk_address_id'=>$fk_address_id,
                         'fk_product_id'=>$fk_product_id[$quantity_key],
                         'quantity'=>$quantity_row,
@@ -1531,10 +1530,20 @@ class Frontend extends REST_Controller {
                     );
                     $this->model->insertData('tbl_order_status',$status_data);
 
+                    $last_total_quantity = $this->model->selectWhereData('inventory', array('product_id'=>$fk_product_id_row,'status'=>"1"),array('qty'),);
+
+                    if(!empty($last_total_quantity)){
+
+                         $inventory_data = array('status' => "0",);
+                         $this->db->where('product_id', $product_id_row);
+                         $this->db->update('inventory', $inventory_data);
+
+                         $inventory_data = array('product_id' => $product_id_row, 'qty' => $last_total_quantity['qty'] - $quantity[$fk_product_id_key]);
+                        $this->api_model->comman_insert('inventory', $inventory_data);
+                    }
                      $this->db->where('fk_user_id', $fk_user_id);
                      $this->db->where('fk_product_id', $fk_product_id_row);
                      $this->db->delete('cart');
-
 
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
