@@ -1584,5 +1584,29 @@ public function order_history_post()
         }
         echo json_encode($response);
     }
+
+    public function get_address_on_id_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+                $address_id = $this->input->post('address_id');
+
+                if(empty($address_id)){
+                    $response['message'] = "Address Id is required";
+                    $response['code'] = 201;
+                }else{
+                    $address_data = $this->model->selectWhereData('user_delivery_address',array('id'=>$address_id),array('*'));
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['address_data'] = $address_data;
+                }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
    
 }
