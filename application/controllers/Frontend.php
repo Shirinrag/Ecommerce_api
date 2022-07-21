@@ -1436,6 +1436,7 @@ class Frontend extends REST_Controller {
               $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
               $payment_type = $this->input->post('payment_type'); 
+              $order_no = json_decode($this->input->post('order_no'),true); 
                       
             if (empty($user_id)) {
                 $response['message'] = 'User Id is required.';
@@ -1466,7 +1467,7 @@ class Frontend extends REST_Controller {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
                         'fk_product_id'=>$fk_product_id_row,
-                        'order_number'=>$order_no,
+                        'order_number'=>$order_no[$fk_product_id_key],
                         'order_id'=>$order_id,
                         'fk_address_id'=>$fk_address_id,
                         'quantity'=>$quantity[$fk_product_id_key],
