@@ -235,7 +235,7 @@ class Superadmin_model extends CI_Model {
         $this->db->join('product','order_data.fk_product_id=product.product_id','left');
         $this->db->join('tbl_order_status','order_data.fk_product_id=tbl_order_status.fk_order_id','left');
         $this->db->join('tbl_order_status_master','tbl_order_status.status=tbl_order_status_master.id','left');
-        $this->db->join('tbl_order_status_master','tbl_order_status.status=tbl_order_status_master.id','left');
+      
         $this->db->join('user_delivery_address','order_data.fk_address_id=user_delivery_address.id','left');
         $this->db->where('order_data.id',$id);   
         $this->db->group_by('tbl_order_status.status');  
