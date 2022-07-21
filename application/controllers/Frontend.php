@@ -1561,29 +1561,28 @@ public function order_history_post()
         echo json_encode($response);
     }
 
-    // public function order_history_post()
-    // {
-    //     $response = array('code' => - 1, 'status' => false, 'message' => '');
-    //     $validate = validateToken();
-    //     if($validate){
-    //             $user_id = $this->input->post('user_id');
+    public function get_all_address_on_user_id_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+                $user_id = $this->input->post('user_id');
 
-    //             if(empty($user_id)){
-    //                 $response['message'] = "User Id is required";
-    //                 $response['code'] = 201;
-    //             }else{
-    //                 $this->load->model('superadmin_model');
-    //                 $order_history = $this->superadmin_model->order_history($user_id);
-    //                 $response['code'] = REST_Controller::HTTP_OK;
-    //                 $response['status'] = true;
-    //                 $response['message'] = 'success';
-    //                 $response['order_history'] = $order_history;
-    //             }
-    //     } else {
-    //         $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
-    //         $response['message'] = 'Unauthorised';
-    //     }
-    //     echo json_encode($response);
-    // }
+                if(empty($user_id)){
+                    $response['message'] = "User Id is required";
+                    $response['code'] = 201;
+                }else{
+                    $address_data = $this->model->selectWhereData('user_delivery_address',array('user_id'=>$user_id),array('*'),false);
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['address_data'] = $address_data;
+                }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
    
 }
