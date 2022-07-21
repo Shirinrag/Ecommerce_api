@@ -1590,7 +1590,7 @@ public function order_history_post()
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();
         if($validate){
-                $address_id = $this->input->post('address_id');
+                $address_id = $this->input->post('id');
 
                 if(empty($address_id)){
                     $response['message'] = "Address Id is required";
