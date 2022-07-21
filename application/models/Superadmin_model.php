@@ -230,7 +230,7 @@ class Superadmin_model extends CI_Model {
 
     public function order_history_on_order_id($id='')
     {
-        $this->db->select('order_data.id,order_data.order_number,order_data.quantity,order_data.grand_total,product.product_name,product.image_name,GROUP_CONCAT(tbl_order_status.status) as status,GROUP_CONCAT(tbl_order_status_master.order_status) as order_status');
+        $this->db->select('order_data.*,product.product_name,product.image_name,GROUP_CONCAT(tbl_order_status.status) as status,GROUP_CONCAT(tbl_order_status_master.order_status) as order_status');
         $this->db->from('order_data');
         $this->db->join('product','order_data.fk_product_id=product.product_id','left');
         $this->db->join('tbl_order_status','order_data.fk_product_id=tbl_order_status.fk_order_id','left');
