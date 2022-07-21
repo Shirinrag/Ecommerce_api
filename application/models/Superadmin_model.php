@@ -230,10 +230,10 @@ class Superadmin_model extends CI_Model {
 
     public function order_history_on_order_id($id='')
     {
-        $this->db->select('order_data.*,product.product_name,product.image_name,GROUP_CONCAT(tbl_order_status.status) as status,GROUP_CONCAT(tbl_order_status_master.order_status) as order_status,user_delivery_address.roomno,user_delivery_address.building,user_delivery_address.street,user_delivery_address.zone,tbl_payment.payment_type,op_user.user_name');
+        $this->db->select('order_data.*,product.product_name,product.image_name,GROUP_CONCAT(tbl_order_status.status) as status,GROUP_CONCAT(tbl_order_status_master.order_status) as order_status,user_delivery_address.roomno,user_delivery_address.building,user_delivery_address.street,user_delivery_address.zone,op_user.user_name');
         $this->db->from('order_data');
         $this->db->join('product','order_data.fk_product_id=product.product_id','left');
-        $this->db->join('tbl_payment','order_data.order_number=tbl_payment.order_id','left');
+        // $this->db->join('tbl_payment','order_data.order_number=tbl_payment.order_id','left');
         $this->db->join('op_user','order_data.fk_user_id=op_user.op_user_id','left');
         $this->db->join('tbl_order_status','order_data.fk_product_id=tbl_order_status.fk_order_id','left');
         $this->db->join('tbl_order_status_master','tbl_order_status.status=tbl_order_status_master.id','left');
