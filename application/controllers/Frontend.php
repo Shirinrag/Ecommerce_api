@@ -1426,7 +1426,8 @@ class Frontend extends REST_Controller {
         if($validate){
               $user_id = $this->input->post('user_id'); 
               $fk_product_id = json_decode($this->input->post('fk_product_id'),true); 
-              $order_no = $this->input->post('order_no'); 
+              $order_id = $this->input->post('order_id'); 
+              $id = $this->input->post('id'); 
               $fk_address_id = $this->input->post('fk_address_id'); 
               $quantity = json_decode($this->input->post('quantity'),true); 
               $unit_price = json_decode($this->input->post('unit_price'),true); 
@@ -1466,6 +1467,7 @@ class Frontend extends REST_Controller {
                         'fk_user_id'=>$user_id,
                         'fk_product_id'=>$fk_product_id_row,
                         'order_number'=>$order_no,
+                        'order_id'=>$order_id,
                         'fk_address_id'=>$fk_address_id,
                         'quantity'=>$quantity[$fk_product_id_key],
                         'unit_price'=>$unit_price[$fk_product_id_key],
@@ -1559,29 +1561,29 @@ public function order_history_post()
         echo json_encode($response);
     }
 
-    public function order_history_post()
-    {
-        $response = array('code' => - 1, 'status' => false, 'message' => '');
-        $validate = validateToken();
-        if($validate){
-                $user_id = $this->input->post('user_id');
+    // public function order_history_post()
+    // {
+    //     $response = array('code' => - 1, 'status' => false, 'message' => '');
+    //     $validate = validateToken();
+    //     if($validate){
+    //             $user_id = $this->input->post('user_id');
 
-                if(empty($user_id)){
-                    $response['message'] = "User Id is required";
-                    $response['code'] = 201;
-                }else{
-                    $this->load->model('superadmin_model');
-                    $order_history = $this->superadmin_model->order_history($user_id);
-                    $response['code'] = REST_Controller::HTTP_OK;
-                    $response['status'] = true;
-                    $response['message'] = 'success';
-                    $response['order_history'] = $order_history;
-                }
-        } else {
-            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
-            $response['message'] = 'Unauthorised';
-        }
-        echo json_encode($response);
-    }
+    //             if(empty($user_id)){
+    //                 $response['message'] = "User Id is required";
+    //                 $response['code'] = 201;
+    //             }else{
+    //                 $this->load->model('superadmin_model');
+    //                 $order_history = $this->superadmin_model->order_history($user_id);
+    //                 $response['code'] = REST_Controller::HTTP_OK;
+    //                 $response['status'] = true;
+    //                 $response['message'] = 'success';
+    //                 $response['order_history'] = $order_history;
+    //             }
+    //     } else {
+    //         $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+    //         $response['message'] = 'Unauthorised';
+    //     }
+    //     echo json_encode($response);
+    // }
    
 }
