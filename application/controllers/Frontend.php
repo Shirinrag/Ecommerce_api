@@ -1501,7 +1501,7 @@ class Frontend extends REST_Controller {
                      $this->db->delete('cart');
 
                       $update_data = array('payment_type'=>$payment_type);
-                      $this->db->where('order_id', $order_no);
+                      $this->db->where('order_id', $order_id);
                       $this->db->update('tbl_payment', $update_data);
                 }
                 $response['code'] = REST_Controller::HTTP_OK;

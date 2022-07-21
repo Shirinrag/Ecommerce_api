@@ -1056,4 +1056,10 @@ class Appapi extends CI_Controller
                 ob_end_clean();
                 $tcpdf->Output($pdfFilePath, "I");
     }
+    function pdf_generation(){
+        error_reporting(0);
+        $this->load->library('pdf');
+        $response = $this->pdf->generate_pdf();
+        echo '<pre>'; print_r($response); exit;
+    }
 }
