@@ -1608,5 +1608,29 @@ public function order_history_post()
         }
         echo json_encode($response);
     }
+
+    public function get_product_name_data_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+                $product_name = $this->input->post('product_name');
+
+                if(empty($product_name)){
+                    $response['message'] = " Product Name is required";
+                    $response['code'] = 201;
+                }else{
+                    $product_details = $this->model->selectWhereData('product',array('product_name'=>$product_name),array('*'));
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['product_details'] = $product_details;
+                }
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
    
 }

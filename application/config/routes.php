@@ -95,3 +95,4 @@ $route['order-history']='Frontend/order_history';
 $route['order-history-on-order-id']='Frontend/order_history_on_order_id';
 $route['get-all-address-on-user-id']='Frontend/get_all_address_on_user_id';
 $route['get-address-on-id']='Frontend/get_address_on_id';
+$route['get-product-name-data']='Frontend/get_product_name_data';
