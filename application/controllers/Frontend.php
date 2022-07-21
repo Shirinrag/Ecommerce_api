@@ -1434,6 +1434,7 @@ class Frontend extends REST_Controller {
               $sub_total = $this->input->post('sub_total'); 
               $tax = json_decode($this->input->post('tax'),true); 
               $grand_total = $this->input->post('grand_total'); 
+              $payment_type = $this->input->post('payment_type'); 
                       
             if (empty($user_id)) {
                 $response['message'] = 'User Id is required.';
@@ -1496,6 +1497,9 @@ class Frontend extends REST_Controller {
                      $this->db->where('product_id', $fk_product_id_row);
                      $this->db->delete('cart');
 
+                      $update_data = array('payment_type'=>$payment_type);
+                      $this->db->where('order_number', $order_no);
+                      $this->db->update('tbl_payment', $update_data);
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
