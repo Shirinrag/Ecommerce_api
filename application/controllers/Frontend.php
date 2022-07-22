@@ -1500,7 +1500,6 @@ class Frontend extends REST_Controller {
                      $this->db->delete('cart');
 
                       $update_data = array('payment_type'=>$payment_type);
-                      echo '<pre>'; print_r($update_dat); exit;
                             $this->db->where('order_id', $order_id);
                       $this->db->update('tbl_payment', $update_data);
                 }
