@@ -549,8 +549,10 @@ class Frontend extends REST_Controller {
                     $product_details['image_name'] = APPURL.$product_details['image_name'];
                     if($fk_lang_id==1){
                             $product_details['product_name'] = $product_details['product_name'];
+                            $product_details['description'] = $product_details['description'];
                          }else{
                             $product_details['product_name'] = $product_details['product_name_ar'];
+                            $product_details['description'] = $product_details['description_ar'];
                          }
                     $img_url = explode(',',$product_details['img_url']);
                     foreach ($img_url as $img_url_key => $img_url_row) {
@@ -564,8 +566,10 @@ class Frontend extends REST_Controller {
 
                          if($fk_lang_id==1){
                             $related_product_details[$related_product_details_key]['product_name'] = $related_product_details_row['product_name'];
+                            $related_product_details[$related_product_details_key]['description'] = $related_product_details_row['description'];
                          }else{
                             $related_product_details[$related_product_details_key]['product_name'] = $related_product_details_row['product_name_ar'];
+                            $related_product_details[$related_product_details_key]['description'] = $related_product_details_row['description_ar'];
                          }
 
                       $related_product_img_url = explode(',',$related_product_details_row['img_url']);
@@ -1484,15 +1488,15 @@ class Frontend extends REST_Controller {
                     );
                     $this->model->insertData('tbl_order_status',$status_data);
 
-                    $last_total_quantity = $this->model->selectWhereData('inventory', array('product_id'=>$fk_product_id_row,'status'=>"1"),array('qty'),);
+                    $last_total_quantity = $this->model->selectWhereData('inventory', array('product_id'=>$fk_product_id_row,'used_status'=>1),array('qty'),);
 
                     if(!empty($last_total_quantity)){
 
-                         $inventory_data = array('status' => "0",);
+                         $inventory_data = array('used_status' => 0,);
                          $this->db->where('product_id', $fk_product_id_row);
                          $this->db->update('inventory', $inventory_data);
 
-                         $inventory_data = array('product_id' => $fk_product_id_row, 'qty' => $last_total_quantity['qty'] - $quantity[$fk_product_id_key]);
+                         $inventory_data = array('product_id' => $fk_product_id_row, 'qty' => $last_total_quantity['qty'] - $quantity[$fk_product_id_key],'deduct_qty'=>$quantity[$fk_product_id_key],'date' => date('m/d/Y'),'used_status'=>1);
                          $this->model->insertData('inventory', $inventory_data);
                     }
                      $this->db->where('user_id', $user_id);
@@ -1632,5 +1636,7 @@ public function order_history_post()
         }
         echo json_encode($response);
     }
+
+
    
 }
