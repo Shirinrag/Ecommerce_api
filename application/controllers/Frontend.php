@@ -564,7 +564,7 @@ class Frontend extends REST_Controller {
                          }else{
                             $product_details['product_name'] = $product_details['product_name_ar'];
                             $product_details['description'] = $product_details['description_ar'];
-                             $product_data['currency_in_english'] = $product_data['currency_in_arabic'];
+                             $product_details['currency_in_english'] = $product_details['currency_in_arabic'];
                          }
                     $img_url = explode(',',$product_details['img_url']);
                     foreach ($img_url as $img_url_key => $img_url_row) {
