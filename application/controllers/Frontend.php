@@ -186,9 +186,9 @@ class Frontend extends REST_Controller {
                      if(!empty($email)){
                          $check_contact_no_count = $this->model->CountWhereRecord('op_user',array('email'=>$email,'status'=>'1'));
                          if ($check_contact_no_count > 0) {
-                            $response['message'] = 'Contact No is already exist.';
+                            $response['message'] = 'Enail is already exist.';
                             $response['code'] = 201;
-                            $response['error_status']="contact";
+                            $response['error_status']="email";
                         } else {
                                 $getTermsConditionId = $this->model->selectWhereData('tbl_about_us',array('module'=>"1",'type'=>'1','is_deleted'=> '1'),array('*'),false,array('id' => 'desc'));
                                 $termsCondtnId = (string)count($getTermsConditionId) > 0 ? $getTermsConditionId[0]['id'] : 0;
