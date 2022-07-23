@@ -246,4 +246,15 @@ class Superadmin_model extends CI_Model {
         $result = $query->row_array();
         return $result;
     }
+
+    public function get_rate($distance_calculation='')
+    {
+       $this->db->select('rate');
+       $this->db->from('tbl_delivery_rate');
+       $this->db->where('from_km >=', $distance_calculation);
+       $this->db->order_by('to_km',"ASC");
+        $query = $this->db->get();
+        $result = $query->row_array();
+        return $result;
+    }
 }

@@ -945,6 +945,7 @@ class Frontend extends REST_Controller {
                         $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
                         $sub_total[]= $cart_data[$cart_data_key]['cartPrice'];                
                 }
+
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['message'] = 'success';
                 $response['status'] = true;  
@@ -1341,7 +1342,7 @@ class Frontend extends REST_Controller {
               $unit_price = json_decode($this->input->post('unit_price'),true); 
               $total = json_decode($this->input->post('total'),true); 
               $sub_total = $this->input->post('sub_total'); 
-              $tax = json_decode($this->input->post('tax'),true); 
+              $tax = $this->input->post('tax'); 
               $grand_total = $this->input->post('grand_total'); 
                   
             if (empty($user_id)) {
@@ -1383,6 +1384,7 @@ class Frontend extends REST_Controller {
                         'unit_price'=>$unit_price[$quantity_key],
                         'total'=>$total[$quantity_key],
                         'sub_total'=>$sub_total,
+                        'tax'=>$tax,
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
                     );
@@ -1636,6 +1638,56 @@ public function order_history_post()
         }
         echo json_encode($response);
     }
+
+    public function get_delivery_charges_on_address_id_post()
+    {
+        $response = array('code' => - 1, 'status' => false, 'message' => '');
+        $validate = validateToken();
+        if($validate){
+                $address_id = $this->input->post('address_id');
+                $user_id = $this->input->post('user_id');
+                $fk_lang_id = $this->input->post('fk_lang_id');
+                if(empty($address_id)){
+                    $response['message']="Address id is required";
+                    $response['code'] = 201;
+                }else{
+                    $this->load->model('superadmin_model');
+                    $user_data = $this->model->selectWhereData('user_delivery_address',array('id'=>$address_id),array('latitude','longitude'));
+                    $client_lat_long= get_lat_long();
+                    $distance_calculation = distance1($client_lat_long['client_latitude'],$client_lat_long['client_longitude'],$user_data['latitude'],$user_data['longitude'],"K");
+                   $distance_calculation = round($distance_calculation);
+              
+                    if($distance_calculation > 50)
+                    {
+                         $rate = $this->superadmin_model->get_rate(50);
+                    }else{
+                         $rate = $this->superadmin_model->get_rate(round($distance_calculation));
+                    }
+
+                     $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
+
+                $total = 0;
+                foreach ($cart_data as $cart_data_key => $cart_data_row) {
+                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['cart_qty'];
+                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['cart_qty'];
+                        $sub_total= $cart_data[$cart_data_key]['cartPrice'];
+                        $total = $total + $sub_total + $rate['rate'];                       
+                }
+                    $response['code'] = REST_Controller::HTTP_OK;
+                    $response['status'] = true;
+                    $response['message'] = 'success';
+                    $response['rate'] = $rate['rate'];
+                    $response['total'] = custom_number_format($total,2);
+            }
+                
+        } else {
+            $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
+            $response['message'] = 'Unauthorised';
+        }
+        echo json_encode($response);
+    }
+
+
 
 
    

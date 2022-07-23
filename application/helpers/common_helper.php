@@ -107,4 +107,47 @@ function add_user_log($user_log)
         return $number_2;
     }
 
+    function get_lat_long()
+    {
+        $response['client_latitude'] = 25.2730664;
+        $response['client_longitude']= 51.4838876;
+
+        return $response;
+    }
+
+    function distance($lat1, $lon1, $lat2, $lon2, $unit) {
+          if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+            return 0;
+          }
+          else {
+            $theta = $lon1 - $lon2;
+            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+            $dist = acos($dist);
+            $dist = rad2deg($dist);
+            $miles = $dist * 60 * 1.1515;
+            $unit = strtoupper($unit);
+
+            if ($unit == "K") {
+              return ($miles * 1.609344);
+            } else if ($unit == "N") {
+              return ($miles * 0.8684);
+            } else {
+              return $miles;
+            }
+        }
+    }
+
+    function distance1($lat1="", $lon1="", $lat2="", $lon2="", $unit="") {
+        $radiusOfEarth = 6371000;// Earth's radius in meters.
+        $diffLatitude = $lat1 - $lat2;
+        $diffLongitude = $lon1 - $lon2;
+        $a = sin($diffLatitude / 2) * sin($diffLatitude / 2) +
+            cos($lat1) * cos($lat2) *
+            sin($diffLongitude / 2) * sin($diffLongitude / 2);
+        $c = 2 * asin(sqrt($a));
+        $distance = $radiusOfEarth * $c;
+        return $distance;
+    }
+
+
    
