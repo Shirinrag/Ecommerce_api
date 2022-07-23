@@ -71,8 +71,11 @@ class Frontend extends REST_Controller {
                     $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
                      if($fk_lang_id==1){
                             $product_data[$product_data_key]['product_name'] = $product_data_row['product_name'];
+                            $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_english'];
+
                      }else{
                             $product_data[$product_data_key]['product_name'] = $product_data_row['product_name_ar'];
+                            $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_arabic'];
                      }
                   }
                   $popular = $this->superadmin_model->get_all_popular_product_data($fk_lang_id);
@@ -83,8 +86,10 @@ class Frontend extends REST_Controller {
                         $popular[$popular_key]['image_name'] = APPURL.$popular_row['image_name'];
                         if($fk_lang_id==1){
                             $popular[$popular_key]['product_name'] = $popular_row['product_name'];
+                             $popular[$popular_key]['currency_in_english'] = $popular_row['currency_in_english'];
                          }else{
                                 $popular[$popular_key]['product_name'] = $popular_row['product_name_ar'];
+                                 $popular[$popular_key]['currency_in_english'] = $popular_row['currency_in_arabic'];
                          }
                       }
                   }
@@ -96,8 +101,10 @@ class Frontend extends REST_Controller {
                             $featured[$featured_key]['image_name'] = APPURL.$featured_row['image_name'];
                             if($fk_lang_id==1){
                                 $featured[$featured_key]['product_name'] = $featured_row['product_name'];
+                                $featured[$featured_key]['currency_in_english'] = $featured_row['currency_in_english'];
                              }else{
                                 $featured[$featured_key]['product_name'] = $featured_row['product_name_ar'];
+                                 $featured[$featured_key]['currency_in_english'] = $featured_row['currency_in_arabic'];
                              }
                       }
                   }
@@ -110,8 +117,10 @@ class Frontend extends REST_Controller {
 
                          if($fk_lang_id==1){
                             $best_selling[$best_selling_key]['product_name'] = $best_selling_row['product_name'];
+                             $best_selling[$best_selling_key]['currency_in_english'] = $best_selling_row['currency_in_english'];
                          }else{
                             $best_selling[$best_selling_key]['product_name'] = $best_selling_row['product_name_ar'];
+                             $best_selling[$best_selling_key]['currency_in_english'] = $best_selling_row['currency_in_arabic'];
                          }
                       }
                   }
@@ -550,9 +559,12 @@ class Frontend extends REST_Controller {
                     if($fk_lang_id==1){
                             $product_details['product_name'] = $product_details['product_name'];
                             $product_details['description'] = $product_details['description'];
+                             $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_english'];
+                             $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_english'];
                          }else{
                             $product_details['product_name'] = $product_details['product_name_ar'];
                             $product_details['description'] = $product_details['description_ar'];
+                             $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_arabic'];
                          }
                     $img_url = explode(',',$product_details['img_url']);
                     foreach ($img_url as $img_url_key => $img_url_row) {
@@ -569,7 +581,9 @@ class Frontend extends REST_Controller {
                             $related_product_details[$related_product_details_key]['description'] = $related_product_details_row['description'];
                          }else{
                             $related_product_details[$related_product_details_key]['product_name'] = $related_product_details_row['product_name_ar'];
+                            $related_product_details[$related_product_details_key]['currency_in_english'] = $related_product_details_row['currency_in_english'];
                             $related_product_details[$related_product_details_key]['description'] = $related_product_details_row['description_ar'];
+                             $related_product_details[$related_product_details_key]['currency_in_english'] = $related_product_details_row['currency_in_arabic'];
                          }
 
                       $related_product_img_url = explode(',',$related_product_details_row['img_url']);
@@ -596,15 +610,7 @@ class Frontend extends REST_Controller {
                                 $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
                          }else{
                                 $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name_ar;
-
                          }
-                        // foreach ($sub_category_id as $key1 => $val1) {
-                        //     $child_cat_name = $this->superadmin_model->get_dynamic_childcat($val1,$fk_lang_id);
-                        //     $custom_key_name = $sub_category_name[$key1] . '_' . $val1 ;
-                        //     $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
-
-
-                        // }
                     }
      
                     $response['code'] = REST_Controller::HTTP_OK;
@@ -1373,18 +1379,18 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Grand Total is required.';
                 $response['code'] = 201;
             }else {
-                foreach ($quantity as $quantity_key => $quantity_row) {
+                foreach ($fk_product_id as $fk_product_id_key => $fk_product_id_row) {
                     $curl_data = array(
                         'fk_user_id'=>$user_id,
                         'order_id'=>$order_id,
                         'order_no'=>mt_rand(100000,999999),
                         'fk_address_id'=>$fk_address_id,
-                        'fk_product_id'=>$fk_product_id[$quantity_key],
-                        'quantity'=>$quantity_row,
-                        'unit_price'=>$unit_price[$quantity_key],
-                        'total'=>$total[$quantity_key],
+                        'fk_product_id'=>$fk_product_id_row,
+                        'quantity'=>$quantity[$fk_product_id_key],
+                        'unit_price'=>$unit_price[$fk_product_id_key],
+                        'total'=>$total[$fk_product_id_key],
                         'sub_total'=>$sub_total,
-                        'tax'=>$tax,
+                        'tax'=>$tax,                        
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
                     );
@@ -1439,7 +1445,7 @@ class Frontend extends REST_Controller {
               $unit_price = json_decode($this->input->post('unit_price'),true); 
               $total = json_decode($this->input->post('total'),true); 
               $sub_total = $this->input->post('sub_total'); 
-              $tax = json_decode($this->input->post('tax'),true); 
+              $tax = $this->input->post('tax'); 
               $grand_total = $this->input->post('grand_total'); 
               $payment_type = $this->input->post('payment_type'); 
               $order_no = json_decode($this->input->post('order_no'),true); 
@@ -1479,6 +1485,7 @@ class Frontend extends REST_Controller {
                         'unit_price'=>$unit_price[$fk_product_id_key],
                         'total'=>$total[$fk_product_id_key],
                         'sub_total'=>$sub_total,
+                        'tax'=>$tax,
                         'grand_total'=>$grand_total,
                         'date'=>date('Y-m-d'),
                     );
@@ -1519,7 +1526,7 @@ class Frontend extends REST_Controller {
         }
         echo json_encode($response);
     }
-public function order_history_post()
+    public function order_history_post()
     {
         $response = array('code' => - 1, 'status' => false, 'message' => '');
         $validate = validateToken();

@@ -114,7 +114,7 @@ class Superadmin_model extends CI_Model {
 
     public function product_details_on_id($product_id='')
     {
-        $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,subcategory.sub_category_name,childcategory.child_category_name');
+        $this->db->select('product.*,GROUP_CONCAT(product_gallery.img_url) as img_url,category.category_name,category.category_name_ar,subcategory.sub_category_name,subcategory.sub_category_name_ar,childcategory.child_category_name,childcategory.child_category_name_ar');
         $this->db->from('product');      
         $this->db->join('product_gallery','product_gallery.product_id=product.product_id','left');
         $this->db->join('category','product.category_id=category.category_id','left');
