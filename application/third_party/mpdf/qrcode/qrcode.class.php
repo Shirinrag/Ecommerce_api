@@ -1,14 +1,4 @@
 <?php
-
-defined('_JEXEC') or die;
-
-/**
- * This file belongs to mPDF Joomla! library which was packaged by CMExtension.
- * mPDF is PHP library for generating PDF.
- * CMExtension only created this package for installing into Joomla! CMS.
- * All credits for mPDF belong to Ian Back and the contributors.
- */
-
 /*
  * Generateur de QRCode
  * (QR Code is registered trademark of DENSO WAVE INCORPORATED | http://www.denso-wave.com/qrcode/)
@@ -60,7 +50,7 @@ if (!defined('__CLASS_QRCODE__'))
 		private $byte_num				= 0;
 		
 		private $final					= array();
-		private $disable_border			= true;
+		private $disable_border			= false;
 		
 		
 		/**

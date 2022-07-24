@@ -1,13 +1,5 @@
 <?php
 
-defined('_JEXEC') or die;
-
-/**
- * This file belongs to mPDF Joomla! library which was packaged by CMExtension.
- * mPDF is PHP library for generating PDF.
- * CMExtension only created this package for installing into Joomla! CMS.
- * All credits for mPDF belong to Ian Back and the contributors.
- */
 
 // mPDF 4.5.009
 define("FF_USERFONT", 15);	// See jpgraph_ttf.inc.php for font IDs
