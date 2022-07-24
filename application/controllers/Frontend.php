@@ -675,49 +675,68 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Language is required';
                 $response['code'] =201;
             }else{
-                    $this->load->model('superadmin_model');
-                    $cat_data = $this->superadmin_model->get_dynamic_cat($fk_lang_id);
-                    foreach ($cat_data as $cat_data_key => $val) {
-                         if($fk_lang_id==1){
-                            $cat_data[$cat_data_key]['category_name'] = $val['category_name'];
-                         }else{
-                            $cat_data[$cat_data_key]['category_name'] = $val['category_name_ar'];
-                         }
-                        $sub_category_id = explode(",", $val['sub_category_id']);
-                        $sub_category_name = explode(",", $val['sub_category_name']);    
-                        $sub_category_name_ar = explode(",", $val['sub_category_name_ar']);    
-                        $cat_data[$cat_data_key]['sub_category_id'] = $sub_category_id;
-                         if($fk_lang_id==1){
-                                $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
-                         }else{
-                                $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name_ar;
-                         }
-                        foreach ($sub_category_id as $key1 => $val1) {
-                            $child_cat_name = $this->superadmin_model->get_dynamic_childcat($val1,$fk_lang_id);
-                                foreach ($child_cat_name as $child_cat_name_key => $child_cat_name_row) {
-                                    if($fk_lang_id==1){
-                                        $child_cat_name[$child_cat_name_key]['child_category_name'] = $child_cat_name_row['child_category_name'];
-                                    }else{
-                                          $child_cat_name[$child_cat_name_key]['child_category_name'] = $child_cat_name_row['child_category_name_ar'];
-                                    }
+                $this->load->model('superadmin_model');
+                $cat_data = $this->superadmin_model->get_dynamic_cat($fk_lang_id);
+                foreach ($cat_data as $cat_data_key => $val) {
+                    if($fk_lang_id==1){
+                        $cat_data[$cat_data_key]['category_name'] = $val['category_name'];
+                    }else{
+                        $cat_data[$cat_data_key]['category_name'] = $val['category_name_ar'];
+                    }
+                    $sub_category_id = explode(",", $val['sub_category_id']);
+                    $sub_category_name = explode(",", $val['sub_category_name']);    
+                    $sub_category_name_ar = explode(",", $val['sub_category_name_ar']);    
+                    $cat_data[$cat_data_key]['sub_category_id'] = $sub_category_id;
+                    if($fk_lang_id==1){
+                        $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name;
+                    }else{
+                        $cat_data[$cat_data_key]['sub_category_name'] = $sub_category_name_ar;
+                    }
+                    foreach ($sub_category_id as $key1 => $val1) {
+                        $child_cat_name = $this->superadmin_model->get_dynamic_childcat($val1,$fk_lang_id);
+                            foreach ($child_cat_name as $child_cat_name_key => $child_cat_name_row) {
+                                if($fk_lang_id==1){
+                                    $child_cat_name[$child_cat_name_key]['child_category_name'] = $child_cat_name_row['child_category_name'];
+                                }else{
+                                      $child_cat_name[$child_cat_name_key]['child_category_name'] = $child_cat_name_row['child_category_name_ar'];
                                 }
-                              if($fk_lang_id==1){
-                                    $custom_key_name = $sub_category_name[$key1] . '_' . $val1 ;
-                                    $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
-                              }else{
-                                 $custom_key_name = $sub_category_name_ar[$key1] . '_' . $val1 ;
-                                    $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
-                              }
+                            }
+                        if($fk_lang_id==1){
+                                $custom_key_name = $sub_category_name[$key1] . '_' . $val1 ;
+                                $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
+                        }else{
+                             $custom_key_name = $sub_category_name_ar[$key1] . '_' . $val1 ;
+                                $cat_data[$cat_data_key]['child_name'][$custom_key_name] = $child_cat_name;
                         }
                     }
-                    $response['code'] = REST_Controller::HTTP_OK;
-                    $response['status'] = true;
-                    $response['message'] = 'success';
-                    $response['cat_data'] = $cat_data;
-                    if(!empty($user_id)){
-                        $response['cart_count'] = get_user_cart_count($user_id);
-                        $response['wishlist_count'] = get_user_wishlist_count($user_id);
+                }
+                if(!empty($user_id)){
+                    $this->load->model('superadmin_model');
+                    $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
+
+                    foreach ($cart_data as $cart_data_key => $cart_data_row) {
+                        $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['cart_qty'];
+                        $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['cart_qty'];
+                        $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
+                        $sub_total[]= $cart_data[$cart_data_key]['cartPrice'];                
                     }
+                    $sub_total_sum = array_sum($sub_total); 
+                    $cart_count = get_user_cart_count($user_id);
+                    $wishlist_count = get_user_wishlist_count($user_id);
+                } else {
+                    $cart_count = '';
+                    $wishlist_count = '';
+                    $cart_data = [];
+                    $sub_total_sum = '';
+                }
+                $response['code'] = REST_Controller::HTTP_OK;
+                $response['status'] = true;
+                $response['message'] = 'success';
+                $response['cat_data'] = $cat_data;
+                $response['cart_data'] = $cart_data;
+                $response['sub_total'] = $sub_total_sum;
+                $response['cart_count'] = $cart_count;
+                $response['wishlist_count'] = $wishlist_count;
             }
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -1244,8 +1263,10 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             } else {
                 $product_data = $this->model->selectWhereData('product',array('category_id'=>$category_id),array('*'),false);
-                foreach ($product_data as $product_data_key => $product_data_row) {
-                   $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                if(!empty($product_data)){
+                        foreach ($product_data as $product_data_key => $product_data_row) {
+                           $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                        }
                 }
                 $sub_category_data = $this->model->selectWhereData('subcategory',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id),array('*'),false);
 
@@ -1290,8 +1311,10 @@ class Frontend extends REST_Controller {
                 $response['code'] = 201;
             } else {
                 $product_data = $this->model->selectWhereData('product',array('sub_category_id'=>$sub_category_id),array('*'),false);
-                foreach ($product_data as $product_data_key => $product_data_row) {
-                   $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                if(!empty($product_data)){
+                        foreach ($product_data as $product_data_key => $product_data_row) {
+                            $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                        }
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
