@@ -1266,6 +1266,14 @@ class Frontend extends REST_Controller {
                 if(!empty($product_data)){
                         foreach ($product_data as $product_data_key => $product_data_row) {
                            $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                           if($fk_lang_id==1){
+                                    $product_data[$product_data_key]['product_name'] = $product_data_row['product_name'];
+                                    $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_english'];
+
+                             }else{
+                                    $product_data[$product_data_key]['product_name'] = $product_data_row['product_name_ar'];
+                                    $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_arabic'];
+                             }
                         }
                 }
                 $sub_category_data = $this->model->selectWhereData('subcategory',array('fk_lang_id'=>$fk_lang_id,'category_id'=>$category_id),array('*'),false);
@@ -1314,6 +1322,14 @@ class Frontend extends REST_Controller {
                 if(!empty($product_data)){
                         foreach ($product_data as $product_data_key => $product_data_row) {
                             $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                            if($fk_lang_id==1){
+                                $product_data[$product_data_key]['product_name'] = $product_data_row['product_name'];
+                                $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_english'];
+
+                             }else{
+                                    $product_data[$product_data_key]['product_name'] = $product_data_row['product_name_ar'];
+                                    $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_arabic'];
+                             }
                         }
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
@@ -1345,6 +1361,14 @@ class Frontend extends REST_Controller {
                 $product_data = $this->model->selectWhereData('product',array('child_category_id'=>$child_category_id),array('*'),false);
                 foreach ($product_data as $product_data_key => $product_data_row) {
                    $product_data[$product_data_key]['image_name'] = APPURL.$product_data_row['image_name'];
+                            if($fk_lang_id==1){
+                                $product_data[$product_data_key]['product_name'] = $product_data_row['product_name'];
+                                $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_english'];
+
+                             }else{
+                                    $product_data[$product_data_key]['product_name'] = $product_data_row['product_name_ar'];
+                                    $product_data[$product_data_key]['currency_in_english'] = $product_data_row['currency_in_arabic'];
+                             }
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  
@@ -1538,6 +1562,36 @@ class Frontend extends REST_Controller {
                       $update_data = array('payment_type'=>$payment_type);
                       $this->db->where('order_id', $order_id);
                       $this->db->update('tbl_payment', $update_data);
+
+                       $order_data = $this->superadmin_model->order_data($order_id);
+
+                       error_reporting(0);
+        
+                        ini_set('memory_limit', '256M');
+                                                
+                        $pdfFilePath = FCPATH . "uploads/'".$user_id."'_invoice_english_.pdf";
+                        $this->load->library('m_pdf');
+                        $data = $order_data;
+                        $html = $this->load->view('invoice_english', array('data'=>$data), true);
+                        $mpdf = new mPDF();
+                        $mpdf->SetDisplayMode('fullpage');
+                        $mpdf->AddPage('P', 'A4');
+                       
+                        $mpdf->WriteHTML($html);
+                        ob_end_clean();
+                        $mpdf->Output($pdfFilePath, "F");
+
+                         $pdfFilePath = FCPATH . "uploads/'".$user_id."'_invoice_arabic_.pdf";
+                        $this->load->library('m_pdf');
+                        $data = $order_data;
+                        $html = $this->load->view('invoice_arabic', array('data'=>$data), true);
+                        $mpdf = new mPDF();
+                        $mpdf->SetDisplayMode('fullpage');
+                        $mpdf->AddPage('P', 'A4');
+                       
+                        $mpdf->WriteHTML($html);
+                        ob_end_clean();
+                        $mpdf->Output($pdfFilePath, "F");
                 }
                 $response['code'] = REST_Controller::HTTP_OK;
                 $response['status'] = true;  

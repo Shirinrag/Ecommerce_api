@@ -27,17 +27,15 @@
            background-color: #d98237;
            padding: 10px 40px;
         }
-        .logo{
-            width: 50%;
-        }
+        
 
         .row{
             display: flex;
             flex-wrap: wrap;
         }
-        .col-md-6{
-            width: 50%;
-            flex: 0 0 auto;
+        .col-6{
+            width: 100%;
+            /*flex: 0 0 auto;*/
         }
         .text-white{
             color: #fff;
@@ -46,16 +44,17 @@
             float: left;
             text-align: left;
         }
-        /* .user-details{
+         .user-details{
             float: right;
-            text-align: left;
-        }*/
+            text-align: right;
+            margin-top: -50px;
+        }
         .body-section{
             padding: 16px;
             border: 1px solid gray;
         }
         .heading{
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 08px;
         }
         .sub-heading{
@@ -102,33 +101,33 @@
         <div class="body-section">
             <div class="row">
                 
-                <div class="col-md-6">
-                    <div class="company-details">
+                <!-- <div class="col-md-6">                    
                         <p class="sub-heading">assdad asd  asda asdad a sd</p>
                         <p class="sub-heading">assdad asd asd</p>
                         <p class="sub-heading"></p>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <h1 class="text-white"><img src="http://localhost/stzsoft/Ecommerce_api/uploads/logo.png" style="height: 50px; float:right; "></h1>
+                    
+                </div> -->
+                <div class="col-md-12">                    
+                   <img src="http://localhost/stzsoft/Ecommerce_api/uploads/logo.jpg" style="margin: auto; float: right; width: 20%; height: 10%;">
+               
                 </div>
             </div>
         </div>
 
         <div class="body-section">
-            <div class="row">                
-                <div class="col-md-6">                    
-                        <p class="sub-heading"><strong>Full Name:  </strong></p>
-                        <p class="sub-heading"><strong>Phone Number:  </strong></p>
-                        <p class="sub-heading"><strong>Address:  </strong></p>                                       
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="sub-heading"><strong>Full Name:  </strong><?=$data[0]['user_name']?></p>
+                        <p class="sub-heading"><strong>Phone Number:  </strong><?=$data[0]['contact_no']?></p>
+                        <p class="sub-heading"><strong>Address:  </strong><?=$data[0]['roomno'].", ".$data[0]['building'].", ".$data[0]['street'].", ".$data[0]['pincode']?></p> 
+                    
                 </div>
                 <div class="col-md-6">
                     <div class="user-details">
-                        <h2 class="heading">Invoice No.: 001</h2>
-                        <p class="sub-heading"><strong>Order Date:</strong> 20-20-2021 </p>
-                        <!-- <p class="sub-heading">Email Address: customer@gfmail.com </p> -->
+                    <h4 ><?=$data[0]['order_id']?> :رقم الفاتورة:</h4>
+                    <p ><?=$data[0]['date']?><strong>: تاريخ الطلب</strong> </p>            
                     </div>
-                </div>
+    </div>
             </div>
         </div>
 
@@ -155,21 +154,20 @@
                     </tr>
                     <tr>
                         <td colspan="4" class="text-right"><strong>Sub Total</strong></td>
-                        <td> 10.XX</td>
+                        <td><?=$data[0]['sub_total']?></td>
                     </tr>
                     <tr>
                         <td colspan="4" class="text-right"><strong>Delivery Rate</strong></td>
-                        <td> 2</td>
+                        <td> <?=$data[0]['tax']?></td>
                     </tr>
                     <tr>
                         <td colspan="4" class="text-right"><strong>Grand Total</strong></td>
-                        <td> 12.XX</td>
+                        <td> <?=$data[0]['grand_total']?></td>
                     </tr>
                 </tbody>
             </table>
             <br>
-            <h5 class="heading">Payment Status: Paid</h5>
-            <h5 class="heading">Payment Mode: Cash on Delivery</h5>
+            <h5 class="heading" style="float:right;">Payment Mode: <?=$data[0]['payment_type']?></h5>
         </div>
 
         <div class="body-section">

@@ -258,4 +258,19 @@ class Superadmin_model extends CI_Model {
         $result = $query->row_array();
         return $result;
     }
+
+    public function order_data($order_id='')
+    {
+        $this->db->select('order_data.*,product.product_name,product.product_name_ar,product.image_name,user_delivery_address.roomno,user_delivery_address.building,user_delivery_address.street,user_delivery_address.zone,op_user.user_name,op_user.contact_no,tbl_payment.payment_type');
+        $this->db->from('order_data');
+        $this->db->join('product','order_data.fk_product_id=product.product_id','left');
+        $this->db->join('tbl_payment','order_data.order_number=tbl_payment.order_no','left');
+        $this->db->join('op_user','order_data.fk_user_id=op_user.op_user_id','left');
+        $this->db->join('user_delivery_address','order_data.fk_address_id=user_delivery_address.id','left');
+        $this->db->where('order_data.order_id',$order_id);   
+        $this->db->order_by('order_data.id','DESC'); 
+        $query = $this->db->get();
+        $result = $query->result_array();
+        return $result;
+    }
 }

@@ -1023,24 +1023,48 @@ class Appapi extends CI_Controller
 
      public function invoice()
     {
-        error_reporting(0);
-        
-        ini_set('memory_limit', '256M');
-                                
-        $pdfFilePath = FCPATH . "uploads/invoice.pdf";
-        // echo '<pre>'; print_r($pdfFilePath); exit;
-        $this->load->library('m_pdf');
+        $order_data = $this->superadmin_model->order_data(77381);
 
-         $this->load->view('invoice_arabic');
-        $html = $this->load->view('invoice_arabic', array(), true);
-        $mpdf = new mPDF();
-        $mpdf->SetDisplayMode('fullpage');
-        $mpdf->AddPage('L', 'A4');
-       
-        $mpdf->WriteHTML($html);
-        ob_end_clean();
-        $mpdf->Output($pdfFilePath, "I");
-        // $response['path'] = $pdfFilePaths;
+                       error_reporting(0);
+        
+                        ini_set('memory_limit', '256M');
+                         $this->load->view('invoice_arabic',);                       
+                        $pdfFilePath = FCPATH . "uploads/'".$user_id."'_invoice_english_.pdf";
+                        $this->load->library('m_pdf');
+                        $data = $order_data;
+                        $html = $this->load->view('invoice_arabic', array('data'=>$data), true);
+                        $mpdf = new mPDF();
+                        $mpdf->SetDisplayMode('fullpage');
+                        $mpdf->AddPage('P','A4');
+                       
+                        $mpdf->WriteHTML($html);
+                        ob_end_clean();
+                        $mpdf->Output($pdfFilePath, "I");
+        
+    }
+     public function invoice1()
+    {
+        $order_data = $this->superadmin_model->order_data(77381);
+
+                       error_reporting(0);
+        
+                        ini_set('memory_limit', '256M');
+                         $this->load->view('invoice_english',);                       
+                        $pdfFilePath = FCPATH . "uploads/'".$user_id."'_invoice_english_.pdf";
+                        $this->load->library('m_pdf');
+                        $data = $order_data;
+                        $html = $this->load->view('invoice_english', array('data'=>$data), true);
+                        $mpdf = new mPDF();
+                        $mpdf->SetDisplayMode('fullpage');
+                        $mpdf->AddPage('P', 'A4');
+                       
+                        $mpdf->WriteHTML($html);
+                        ob_end_clean();
+                        $mpdf->Output($pdfFilePath, "I");
+        
+    }
+}
+// $response['path'] = $pdfFilePaths;
         //   $data=[];
         //         $pdfFilePath = "output_pdf_name.pdf";
         //         $this->load->library('Pdf');
@@ -1057,5 +1081,3 @@ class Appapi extends CI_Controller
         //         $tcpdf->WriteHTML($html);
         //         ob_end_clean();
         //         $tcpdf->Output($pdfFilePath, "I");
-    }
-}
