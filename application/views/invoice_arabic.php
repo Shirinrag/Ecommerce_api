@@ -117,7 +117,7 @@
         <div class="body-section">
             <div class="row">
                 <div class="col-md-6">
-                    <p class="sub-heading"><strong>Full Name:  </strong><?=$data[0]['user_name']?></p>
+                    <p class="sub-heading"><strong>الاسم:ا</strong><?=$data[0]['user_name']?></p>
                         <p class="sub-heading"><strong>Phone Number:  </strong><?=$data[0]['contact_no']?></p>
                         <p class="sub-heading"><strong>Address:  </strong><?=$data[0]['roomno'].", ".$data[0]['building'].", ".$data[0]['street'].", ".$data[0]['pincode']?></p> 
                     

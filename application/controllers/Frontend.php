@@ -1618,6 +1618,7 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if($validate){
                 $user_id = $this->input->post('user_id');
+                $fk_lang_id = $this->input->post('fk_lang_id');
 
                 if(empty($user_id)){
                     $response['message'] = "User Id is required";
@@ -1625,6 +1626,14 @@ class Frontend extends REST_Controller {
                 }else{
                     $this->load->model('superadmin_model');
                     $order_history = $this->superadmin_model->order_history($user_id);
+                      if($fk_lang_id==1){
+                                $order_history[$order_history_key]['product_name'] = $order_history_row['product_name'];
+                                $order_history[$order_history_key]['currency_in_english'] = $order_history_row['currency_in_english'];
+
+                             }else{
+                                    $order_history[$order_history_key]['product_name'] = $order_history_row['product_name_ar'];
+                                    $order_history[$order_history_key]['currency_in_english'] = $order_history_row['currency_in_arabic'];
+                             }
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
@@ -1642,12 +1651,22 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if($validate){
                 $id = $this->input->post('id');
+                $fk_lang_id = $this->input->post('fk_lang_id');
+
                 if(empty($id)){
                     $response['message'] = "Id is required";
                     $response['code'] = 201;
                 }else{
                     $this->load->model('superadmin_model');
                     $order_history = $this->superadmin_model->order_history_on_order_id($id);
+                    if($fk_lang_id==1){
+                                $order_history['product_name'] = $order_history['product_name'];
+                                $order_history['currency_in_english'] = $order_history['currency_in_english'];
+
+                             }else{
+                                    $order_history['product_name'] = $order_history['product_name_ar'];
+                                    $order_history['currency_in_english'] = $order_history['currency_in_arabic'];
+                             }
                     $response['code'] = REST_Controller::HTTP_OK;
                     $response['status'] = true;
                     $response['message'] = 'success';
