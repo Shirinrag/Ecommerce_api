@@ -968,7 +968,16 @@ class Frontend extends REST_Controller {
                         $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['cart_qty'];
                         $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['cart_qty'];
                         $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
-                        $sub_total[]= $cart_data[$cart_data_key]['cartPrice'];                
+                        $sub_total[]= $cart_data[$cart_data_key]['cartPrice']; 
+
+                        if($fk_lang_id==1){
+                                $cart_data[$cart_data_key]['product_name'] = $cart_data_row['product_name'];
+                                $cart_data[$cart_data_key]['currency_in_english'] = $cart_data_row['currency_in_english'];
+
+                             }else{
+                                    $cart_data[$cart_data_key]['product_name'] = $cart_data_row['product_name_ar'];
+                                    $cart_data[$cart_data_key]['currency_in_english'] = $cart_data_row['currency_in_arabic'];
+                             }               
                 }
 
                 $response['code'] = REST_Controller::HTTP_OK;
