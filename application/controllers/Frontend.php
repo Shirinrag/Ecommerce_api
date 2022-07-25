@@ -713,12 +713,12 @@ class Frontend extends REST_Controller {
                 if(!empty($user_id)){
                     $this->load->model('superadmin_model');
                     $cart_data = $this->superadmin_model->get_cart_data($user_id,$fk_lang_id);
-
+                    $sub_total= [];
                     foreach ($cart_data as $cart_data_key => $cart_data_row) {
                         $cart_data[$cart_data_key]['cartPrice'] = $cart_data_row['product_offer_price'] * $cart_data_row['cart_qty'];
                         $cart_data[$cart_data_key]['cartQuantity'] = $cart_data_row['cart_qty'];
                         $cart_data[$cart_data_key]['image_name'] = APPURL.$cart_data_row['image_name'];
-                        $sub_total[]= $cart_data[$cart_data_key]['cartPrice'];                
+                        @$sub_total[]= $cart_data[$cart_data_key]['cartPrice'];                
                     }
                     $sub_total_sum = array_sum($sub_total); 
                     $cart_count = get_user_cart_count($user_id);

@@ -220,10 +220,11 @@ class Superadmin_model extends CI_Model {
 
     public function order_history($user_id='')
     {
-        $this->db->select('order_data.id,order_data.order_number,order_data.quantity,order_data.grand_total,product.product_name,product.image_name');
+        $this->db->select('order_data.id,order_data.order_number,order_data.order_id,order_data.quantity,order_data.grand_total,product.product_name,product.image_name');
         $this->db->from('order_data');
         $this->db->join('product','order_data.fk_product_id=product.product_id','left');
         $this->db->where('order_data.fk_user_id',$user_id);     
+        $this->db->order_by('order_data.id',"DESC");
         $query = $this->db->get();
         $result = $query->result_array();
         return $result;
@@ -237,8 +238,7 @@ class Superadmin_model extends CI_Model {
         $this->db->join('tbl_payment','order_data.order_number=tbl_payment.order_no','left');
         $this->db->join('op_user','order_data.fk_user_id=op_user.op_user_id','left');
         $this->db->join('tbl_order_status','order_data.fk_product_id=tbl_order_status.fk_order_id','left');
-        $this->db->join('tbl_order_status_master','tbl_order_status.status=tbl_order_status_master.id','left');
-      
+        $this->db->join('tbl_order_status_master','tbl_order_status.status=tbl_order_status_master.id','left');      
         $this->db->join('user_delivery_address','order_data.fk_address_id=user_delivery_address.id','left');
         $this->db->where('order_data.id',$id);   
         $this->db->group_by('tbl_order_status.status'); 
