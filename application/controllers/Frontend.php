@@ -13,7 +13,6 @@ class Frontend extends REST_Controller {
         header('Access-Control-Allow-Headers: Content-Type');
         header('Content-Type: text/html; charset=utf-8');
         header('Content-Type: application/json; charset=utf-8'); 
-
     }
 
    /*200 = OK
@@ -810,24 +809,43 @@ class Frontend extends REST_Controller {
                 $response['message'] = 'Product Id is required.';
                 $response['code'] = 201;
             }else{
-                $check_wishlist_count = $this->model->CountWhereRecord('wishlist',array('user_id'=>$user_id,'product_id'=>$product_id));
-                 if ($check_wishlist_count > 0) {
-                            $response['message'] = 'Product Already exist.';
-                            $response['code'] = 201;                        
-                } else {
-                        $curl_data=array(
-                            'user_id'=>$user_id,
-                            'product_id'=>$product_id,
-                        );
-                        $this->model->insertData('wishlist',$curl_data);
-                        $response['code'] = REST_Controller::HTTP_OK;
-                        $response['status'] = true;
-                        if($fk_lang_id==1){
-                            $response['message'] = 'Added to Wishlist';
+                // $check_wishlist_count = $this->model->CountWhereRecord('wishlist',array('user_id'=>$user_id,'product_id'=>$product_id));
+                //  if ($check_wishlist_count > 0) {
+                //             $response['message'] = 'Product Already exist.';
+                //             $response['code'] = 201;                        
+                // } else {
+                        $wishlist_count = $this->model->CountWhereRecord('wishlist',array('user_id'=>$user_id,'product_id'=>$product_id));
+                        if($wishlist_count ==1){
+                            $curl_data=array(
+                                'user_id'=>$user_id,
+                                'product_id'=>$product_id,
+                            );
+                            $this->model->direct_delete('wishlist',$curl_data);
+                            $response['code'] = REST_Controller::HTTP_OK;
+                            $response['status'] = true;
+                            if($fk_lang_id==1){
+                                $response['message'] = 'Removed from Wishlist';
+                            }else{
+                                $response['message'] = 'تمت إزالته من قائمة الرغبات  ';
+                            }
                         }else{
-                            $response['message'] = 'تم الإضافة الى قائمة المفضلة ';
-                        }
-                }
+                            $curl_data=array(
+                                'user_id'=>$user_id,
+                                'product_id'=>$product_id,
+                            );
+                            $this->model->insertData('wishlist',$curl_data);
+                            $response['code'] = REST_Controller::HTTP_OK;
+                            $response['status'] = true;
+                            if($fk_lang_id==1){
+                                $response['message'] = 'Added to Wishlist';
+                                $response['message1'] = 'Added to Wishlist';
+                            }else{
+                                $response['message'] = 'تم الإضافة الى قائمة المفضلة ';
+                                $response['message1'] = 'Added to Wishlist';
+
+                            }
+                        }                       
+                // }
             }           
         } else {
             $response['code'] = REST_Controller::HTTP_UNAUTHORIZED;
@@ -2389,7 +2407,6 @@ class Frontend extends REST_Controller {
               $checksumhash = $this->input->post('checksumhash'); 
               $category_type = $this->input->post('category_type');
               
-            //   print_r($payment_type);die;
             if (empty($user_id)) {
                 $response['message'] = 'User Id is required.';
                 $response['code'] = 201;
@@ -2440,13 +2457,12 @@ class Frontend extends REST_Controller {
                     );
                     // print_r($curl_data);
                     $inserted_id = $this->model->insertData('order_data',$curl_data);
-
-                    $status_data = array(
-                        'fk_order_id'=>@$inserted_id,
-                        'status'=>1,
-                        'order_id'=>$order_id,
+                    $delete_wishlist_data=array(
+                        'user_id'=>$user_id,
+                        'product_id'=>$fk_product_id_row,
                     );
-                    $this->model->insertData('tbl_order_status',$status_data);
+                    $this->model->direct_delete('wishlist',$delete_wishlist_data);
+                   
                     $this->model->updateData('op_user',array('fk_address_id'=>$fk_address_id),array('op_user_id'=>$user_id));
                     $last_total_quantity = $this->model->selectWhereData('inventory', array('product_id'=>$fk_product_id_row,'used_status'=>1),array('qty'));
                     
@@ -2479,26 +2495,30 @@ class Frontend extends REST_Controller {
                           'STATUS' => $STATUS,
                           'TXNAMOUNT' => $TXNAMOUNT,
                           'checksumhash' => $checksumhash,
-                          );
-                        //   print_r($update_data);
-                        //   print_r($order_id);
+                      );
                       $this->db->where('order_id', $order_id);
                       $this->db->update('tbl_payment', $update_data);
-                    //   die;
                       $product_data1 = $this->model->selectWhereData('product', array('product_id'=>$fk_product_id_row),array('category_type'));
                       
                       if($product_data1['category_type'] =="Gift Card"){
-                          $uniq_code = $this->model->selectWhereData('tbl_gift_card_code', array('fk_product_id'=>$fk_product_id_row,'gift_card_stock'=>'1'),array('uniq_code'));
-                        //   print_r($uniq_code);die;
-                          $details = array(
-                            'uniq_code' =>$uniq_code['uniq_code'],
+                          $status_data = array(
+                            'fk_order_id'=>@$inserted_id,
+                            'status'=>4,
                             'order_id'=>$order_id,
-                          );
+                        );
+                        $this->model->insertData('tbl_order_status',$status_data);
+                          $uniq_code = $this->model->selectWhereData('tbl_gift_card_code', array('fk_product_id'=>$fk_product_id_row,'gift_card_stock'=>'1'),array('uniq_code'));
+                      
+                              $details = array(
+                                'uniq_code' =>$uniq_code['uniq_code'],
+                                'order_id'=>$order_id,
+                              );
                     
                             $update_data1 = array(
                                 'gift_card_stock'=>'0' 
                             );
                             $this->db->where('uniq_code', $uniq_code['uniq_code']);
+                            $this->db->where('fk_product_id', $fk_product_id_row);
                             $this->db->update('tbl_gift_card_code', $update_data1);
 
                             $gift_code_update = array(
@@ -2518,8 +2538,10 @@ class Frontend extends REST_Controller {
                             $msg_html .= "Thank you for your order from Circuit Store! Please find below the Gift Card Code: ";  
                             $msg_html .= "\r\n";  
                             $msg_html .= "Code: ".$uniq_code['uniq_code'];
-                            $msg_html .= "\r\n";   
-                            $msg_html .= "Enjoy and see you soon ";   
+                            $msg_html .= "\r\n";  
+                             $msg_html .= "For any inquiries you can contact our customer service number +97466655674"; 
+                             $msg_html .= "\r\n";
+                            $msg_html .= "Enjoy and see you soon ";
                             $curl_data1 = array(
                                 'number' => '974'.$user_details['contact_no'],
                                 'msg' => $msg_html,
@@ -2529,12 +2551,20 @@ class Frontend extends REST_Controller {
                             );
 
                           $curl = $this->link->whatsapp_hits($curl_data1);
-                        //   print_r($curl);die;
+
+                       
+                      }else{
+                         $status_data = array(
+                            'fk_order_id'=>@$inserted_id,
+                            'status'=>1,
+                            'order_id'=>$order_id,
+                        );
+                        $this->model->insertData('tbl_order_status',$status_data);
                       }
                       
                        $this->load->model('superadmin_model');
                        $order_data = $this->superadmin_model->order_data($order_id);
-
+                      
                        error_reporting(0);
         
                         ini_set('memory_limit', '256M');
@@ -2558,6 +2588,7 @@ class Frontend extends REST_Controller {
                         $mpdf = new mPDF();
                         $mpdf->SetDisplayMode('fullpage');
                         $mpdf->AddPage('P','A4');
+                        $mpdf->autoScriptToLang = true;
                         $mpdf->autoLangToFont = true;
                         $mpdf->WriteHTML($html);
                         ob_end_clean();
@@ -2940,9 +2971,13 @@ class Frontend extends REST_Controller {
         $validate = validateToken();
         if($validate){
                 $email = $this->input->post('email');
-               
+                $fk_lang_id = $this->input->post('fk_lang_id');
                 if(empty($email)){
-                    $response['message'] = "Email is required";
+                    if($fk_lang_id==1){
+                        $response['message'] = "Email is required";
+                    }else{
+                        $response['message'] = "البريد الإلكتروني مسجل مسبقاً";
+                    }
                     $response['code'] = 201;
                 }else{
                     $curl_data=array(
